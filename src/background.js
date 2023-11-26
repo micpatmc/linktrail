@@ -20,7 +20,6 @@ function updateTabData(tabURL) {
 }
 
 function updateAllTabs() {
-  console.log(tabData);
   for (const tabURL in tabData) {
     // console.log(tabId + " " + activeTabId);
     updateTabData(tabURL);
@@ -42,7 +41,7 @@ function getTabInfo(tabId) {
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
 
   const tab = await getTabInfo(activeInfo.tabId);
-  
+  console.log(activeInfo);
   if (tab.url == "")
     activeTabURL = extractDomainAndPath(tab.pendingUrl);
   else
@@ -55,7 +54,8 @@ chrome.tabs.onActivated.addListener(async (activeInfo) => {
       url: activeTabURL,
       startTime: Date.now(),
       totalTime: 0,
-      favicon: `https://s2.googleusercontent.com/s2/favicons?domain_url=${tab.url}`
+      origin: new URL(tab.url).origin,
+      favicon: tab.favIconUrl,
     };
   }
 });
@@ -72,7 +72,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         url: shortenedURL,
         startTime: Date.now(),
         totalTime: 0,
-        favicon: `https://s2.googleusercontent.com/s2/favicons?domain_url=${tab.url}`
+        origin: new URL(tab.url).origin,
+        favicon: tab.favIconUrl
       };
     } else {
       console.log("Old tab");
@@ -93,6 +94,7 @@ chrome.windows.onFocusChanged.addListener((windowId) => {
 function extractDomainAndPath(url) {
   const urlObject = new URL(url);
   var shortenedPath = "/";
+  console.log(urlObject);
 
   for (var i = 1; i < urlObject.pathname.length; i++) {
     if (urlObject.pathname[i] == "/") break;

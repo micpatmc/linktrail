@@ -1,0 +1,101 @@
+/* TODO: Change the background color of the header and footer */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  scroll-behavior: auto;
+  font-family: "Poppins", sans-serif;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}
+
+.main {
+  width: 600px;
+  height: 600px;
+  overflow-y: auto;
+  background-color: white;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 10%;
+  background-color: gray;
+}
+
+.content {
+  display: flex;
+  position: absolute;
+  flex-direction: column;
+  align-items: center;
+  bottom: 0;
+  width: 100%;
+  height: 90%;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  /* top: 50%; */
+  overflow-y: auto;
+}
+
+.content-button {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+  min-height: 100px;
+  width: 95%;
+  background-color: white;
+  border-radius: 10px;
+  border-color: rgba(224, 167, 9, 1);
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  border: 2px solid #00AA66;
+}
+
+.content-button:hover {
+  background-color: aliceblue;
+}
+
+
+
+.header p {
+  position: relative;
+  left: 15px;
+  color: white;
+  font-size: 20px;
+}
+
+#name {
+  position: absolute;
+  left: 15%;
+  top: 15%;
+  font-size: 20px;
+}
+
+#time {
+  position: absolute;
+  left: 15%;
+  top: 50%;
+  font-size: 15px;
+}
+
+#image {
+  position: absolute;
+  left: 5%;
+  width: 30px;
+}
+
+.progress-bar {
+  position: absolute;
+  left: 15%;
+  bottom: 10%;
+  height: 7.5px;
+  background-color: rgb(76, 135, 175);
+  border-radius: 10px;
+}
