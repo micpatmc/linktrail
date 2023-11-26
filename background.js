@@ -1,77 +1,90 @@
-let activeTabId;
+let activeTabURL;
 let tabData = {};
 
-function updateTabData(tabId) {
-    if (tabData[tabId] && tabData[tabId].startTime !== undefined) {
-        if (isActiveTab(tabId)) {
-            console.log("TabId Match");
+function updateTabData(tabURL) {
+  if (tabData[tabURL] && tabData[tabURL].startTime !== undefined) {
+    if (isActiveTab(tabURL)) {
+      const currentTime = Date.now();
 
-            const currentTime = Date.now();
-            console.log(Date.now() + " " + tabData[tabId].startTime);
+      if (!tabData[tabURL].startTime) {
+        // Initialize startTime if not already set
+        tabData[tabURL].startTime = currentTime;
+      }
 
-            if (!tabData[tabId].startTime) {
-                // Initialize startTime if not already set
-                tabData[tabId].startTime = currentTime;
-            }
-            
-            tabData[tabId].totalTime += currentTime - tabData[tabId].startTime;
-            tabData[tabId].startTime = currentTime;
-        } else {
-            tabData[tabId].startTime = Date.now(); // Pause the timer if the tab is not active
-        }
+      tabData[tabURL].totalTime += currentTime - tabData[tabURL].startTime;
+      tabData[tabURL].startTime = currentTime;
+    } else {
+      tabData[tabURL].startTime = Date.now(); // Pause the timer if the tab is not active
     }
-  }
-
-function updateAllTabs() {
-  for (const tabId in tabData) {
-    // console.log(tabId + " " + activeTabId);
-    updateTabData(tabId);
   }
 }
 
-chrome.tabs.onActivated.addListener((activeInfo) => {
-  updateTabData(activeTabId);
-  activeTabId = activeInfo.tabId;
-});
+function updateAllTabs() {
+  console.log(tabData);
+  console.log(activeTabURL);
+  for (const tabURL in tabData) {
+    // console.log(tabId + " " + activeTabId);
+    updateTabData(tabURL);
+  }
+}
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status === 'complete') {
+  if (changeInfo.status === "complete") {
     // Initialize or update tabData for the tab
-    if (!tabData[tabId]) {
-    console.log("New tab");
-      tabData[tabId] = {
-        url: tab.url,
+    const shortenedURL = extractDomainAndPath(tab.url);
+    activeTabURL = shortenedURL;
+    if (!tabData[tab.url]) {
+      console.log("New tab");
+
+      console.log(shortenedURL);
+      tabData[shortenedURL] = {
+        url: shortenedURL,
         startTime: Date.now(),
         totalTime: 0,
       };
     } else {
-        console.log("Old tab");
-      tabData[tabId].url = tab.url;
+      console.log("Old tab");
+      tabData[shortenedURL].shortenedURL = shortenedURL;
     }
   }
 });
 
 chrome.windows.onFocusChanged.addListener((windowId) => {
-  updateTabData(activeTabId);
+  updateTabData(activeTabURL);
 
   if (windowId !== chrome.windows.WINDOW_ID_NONE) {
     // Window gained focus, update startTime for the active tab
-    if (tabData[activeTabId]) {
-      tabData[activeTabId].startTime = Date.now();
+    if (tabData[activeTabURL]) {
+      tabData[activeTabURL].startTime = Date.now();
     }
   }
 });
+
+function extractDomainAndPath(url) {
+  const urlObject = new URL(url);
+  var shortenedPath = "/";
+
+  for (var i = 1; i < urlObject.pathname.length; i++) {
+    if (urlObject.pathname[i] == "/") break;
+
+    shortenedPath += urlObject.pathname[i];
+  }
+
+  if (shortenedPath.length > 1) return urlObject.origin + shortenedPath;
+  else return urlObject.origin;
+}
 
 // Periodically update all tabs to ensure accurate time tracking
 setInterval(updateAllTabs, 1000);
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.message === 'getTabData') {
-    updateTabData(activeTabId); // Update the active tab before sending data
+  if (request.message === "getTabData") {
+    updateTabData(activeTabURL); // Update the active tab before sending data
+    console.log(tabData);
     sendResponse({ tabData });
   }
 });
 
-function isActiveTab(tabId) {
-    return tabId === activeTabId;
+function isActiveTab(tabURL) {
+  return tabURL === activeTabURL;
 }
