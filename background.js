@@ -21,12 +21,44 @@ function updateTabData(tabURL) {
 
 function updateAllTabs() {
   console.log(tabData);
-  console.log(activeTabURL);
   for (const tabURL in tabData) {
     // console.log(tabId + " " + activeTabId);
     updateTabData(tabURL);
   }
 }
+
+function getTabInfo(tabId) {
+  return new Promise((resolve, reject) => {
+    chrome.tabs.get(tabId, (tab) => {
+      if (chrome.runtime.lastError) {
+        reject(chrome.runtime.lastError);
+      } else {
+        resolve(tab);
+      }
+    });
+  });
+}
+
+chrome.tabs.onActivated.addListener(async (activeInfo) => {
+
+  const tab = await getTabInfo(activeInfo.tabId);
+  
+  if (tab.url == "")
+    activeTabURL = extractDomainAndPath(tab.pendingUrl);
+  else
+    activeTabURL = extractDomainAndPath(tab.url);
+
+  if (!tabData[activeTabURL] && activeTabURL !== undefined) {
+    console.log("New tab");
+
+    tabData[activeTabURL] = {
+      url: activeTabURL,
+      startTime: Date.now(),
+      totalTime: 0,
+      favicon: `https://s2.googleusercontent.com/s2/favicons?domain_url=${tab.url}`
+    };
+  }
+});
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === "complete") {
@@ -36,22 +68,20 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (!tabData[tab.url]) {
       console.log("New tab");
 
-      console.log(shortenedURL);
       tabData[shortenedURL] = {
         url: shortenedURL,
         startTime: Date.now(),
         totalTime: 0,
+        favicon: `https://s2.googleusercontent.com/s2/favicons?domain_url=${tab.url}`
       };
     } else {
       console.log("Old tab");
-      tabData[shortenedURL].shortenedURL = shortenedURL;
+      tabData[shortenedURL].url = shortenedURL;
     }
   }
 });
 
 chrome.windows.onFocusChanged.addListener((windowId) => {
-  updateTabData(activeTabURL);
-
   if (windowId !== chrome.windows.WINDOW_ID_NONE) {
     // Window gained focus, update startTime for the active tab
     if (tabData[activeTabURL]) {
@@ -70,8 +100,9 @@ function extractDomainAndPath(url) {
     shortenedPath += urlObject.pathname[i];
   }
 
-  if (shortenedPath.length > 1) return urlObject.origin + shortenedPath;
-  else return urlObject.origin;
+  // if (shortenedPath.length > 1) return urlObject.origin + shortenedPath;
+  // else return urlObject.origin;
+  return urlObject.host;
 }
 
 // Periodically update all tabs to ensure accurate time tracking
@@ -80,7 +111,6 @@ setInterval(updateAllTabs, 1000);
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.message === "getTabData") {
     updateTabData(activeTabURL); // Update the active tab before sending data
-    console.log(tabData);
     sendResponse({ tabData });
   }
 });

@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-  chrome.runtime.sendMessage({ message: "getTabData" }, function (response) {
+  chrome.runtime.sendMessage({ message: "getTabData" }, async function (response) {
     const tableBody = document.getElementById("tableBody");
     for (const tabURL in response.tabData) {
       const tabInfo = response.tabData[tabURL];
@@ -18,6 +18,9 @@ document.addEventListener("DOMContentLoaded", function () {
       row.insertCell(0).textContent = tabInfo.url;
       row.insertCell(1).textContent =
         (tabInfo.totalTime / 1000).toFixed(2) + "s";
+      const faviconImage = await createImageElement(tableBody, response.tabData[tabURL].favicon);
+      tableBody.appendChild(faviconImage);
+      
       // }
     }
 
@@ -40,3 +43,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
+
+function createImageElement(src) {
+  const img = document.createElement("img");
+  img.src = src;
+  return img;
+}
