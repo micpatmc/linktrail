@@ -55,20 +55,34 @@
   border-color: rgba(224, 167, 9, 1);
   cursor: pointer;
   transition: all 0.3s ease-in-out;
-  border: 2px solid #00AA66;
+  border: 2px solid #00aa66;
 }
 
 .content-button:hover {
   background-color: aliceblue;
 }
 
-
-
 .header p {
   position: relative;
   left: 15px;
   color: white;
   font-size: 20px;
+}
+
+.category-button {
+  position: absolute;
+  left: 30%;
+  top: 45%;
+  color: black;
+  width: 100px;
+  height: 25px;
+  border-radius: 10px;
+}
+
+#category {
+  left: 15%;
+  top: 15%;
+  font-size: 15px;
 }
 
 #name {
