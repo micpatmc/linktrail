@@ -3,10 +3,17 @@ const categoryMap = new Map([
   ["https://www.w3schools.com", "Education"],
 ]);
 
+const colorMap = new Map([
+  ["Productivity", "rgb(255, 0, 0, 0.06)"],
+  ["Education", "rgb(0, 255, 0, 0.06)"],
+  ["Utilities", "rgb(0, 0, 255, 0.06)"]
+])
+
 // Current categories:
 // Social
 // Utilities
-// Productivity & Finance
+// Productivity 
+// Finance
 // Education
 // Shopping & Food
 // Entertainment
@@ -56,18 +63,25 @@ function createButton(tabInfo, actualTotalTime) {
     chrome.tabs.create({ url: `${tabInfo.origin}` }); // Replace with your desired URL
   });
 
-  // Category sub-button
+  // Create category
   const categoryButton = document.createElement("button");
   categoryButton.className = "category-button";
 
-  // Text for the category sub-button
+  // Create Text for the category
   const categoryParagraph = document.createElement("p");
   categoryParagraph.id = "category";
 
   // Fill in the category based on global map
   if (categoryMap.has(tabInfo.origin))
+  {
     categoryParagraph.textContent = categoryMap.get(tabInfo.origin);
-  else categoryParagraph.textContent = "N/A";
+    categoryButton.style.backgroundColor = colorMap.get(categoryParagraph.textContent);
+  }
+  else
+  {
+    categoryParagraph.textContent = "None";
+    categoryButton.backgroundColor = "rgb(0, 0, 0, 0.06)"
+  }
 
   categoryButton.appendChild(categoryParagraph);
 
@@ -105,15 +119,28 @@ function createButton(tabInfo, actualTotalTime) {
   // Create the progress bar
   const progressBar = document.createElement("div");
   progressBar.className = "progress-bar";
-  const progressWidth = (tabInfo.totalTime / 1000 / actualTotalTime) * 80;
-  progressBar.style.width = `${progressWidth}%`;
+  const progressWidth = (tabInfo.totalTime / 1000 / actualTotalTime) * 100;
+  progressBar.style.width = `${progressWidth / 3}%`;
+
+  const progressBarBackground = document.createElement("div");
+  progressBarBackground.className = "progress-bar-background";
+  progressBarBackground.style.width = `${100 / 3}%`;
+
+  const progressParagraph = document.createElement("p");
+  progressParagraph.id = "progress-value"
+  progressParagraph.textContent = progressWidth.toFixed(1) + "%";
+
+  console.log(progressBar.style.width);
+  console.log(progressBarBackground.style.width);
 
   // Append the image, paragraphs, and progress bar to the button
   button.appendChild(img);
   button.appendChild(categoryButton);
+  button.appendChild(progressBarBackground);
   button.appendChild(progressBar);
   button.appendChild(nameParagraph);
   button.appendChild(timeParagraph);
+  button.appendChild(progressParagraph);
 
   // Set time to sort with
   button.dataset.time = tabInfo.totalTime;
