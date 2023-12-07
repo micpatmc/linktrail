@@ -20,6 +20,7 @@ const colorMap = new Map([
 // Health & Fitness
 
 document.addEventListener("DOMContentLoaded", function () {
+  
   chrome.runtime.sendMessage(
     { message: "getTabData" },
     async function (response) {
@@ -49,6 +50,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Append the sorted buttons to the content div
       buttons.forEach((button) => content.appendChild(button));
+
+      checkDropdownButtons(buttons);
     }
   );
 });
@@ -130,9 +133,6 @@ function createButton(tabInfo, actualTotalTime) {
   progressParagraph.id = "progress-value"
   progressParagraph.textContent = progressWidth.toFixed(1) + "%";
 
-  console.log(progressBar.style.width);
-  console.log(progressBarBackground.style.width);
-
   // Append the image, paragraphs, and progress bar to the button
   button.appendChild(img);
   button.appendChild(categoryButton);
@@ -144,6 +144,83 @@ function createButton(tabInfo, actualTotalTime) {
 
   // Set time to sort with
   button.dataset.time = tabInfo.totalTime;
+  button.dataset.category = categoryParagraph.textContent;
 
   return button;
 }
+
+// Handle item selection and call a function
+function sortContent(item, buttons) {
+
+  console.log(buttons);
+
+  if (item == "Usage-HighToLow")
+  {
+    console.log("Hello");
+    // Sort the buttons based on descending time
+    buttons.sort((buttonA, buttonB) => {
+      const timeA = buttonA.dataset.time;
+      const timeB = buttonB.dataset.time;
+      return timeB - timeA;
+    });
+  }
+  else if (item == "Usage-LowToHigh")
+  {
+    // Sort the buttons based on ascending time
+    buttons.sort((buttonA, buttonB) => {
+      const timeA = buttonA.dataset.time;
+      const timeB = buttonB.dataset.time;
+      return timeA - timeB;
+    });
+  }
+  else if (item == "Category-HighToLow")
+  {
+    // Sort the buttons based on categories, in alphabetical order
+    buttons.sort((buttonA, buttonB) => {
+      const categoryA = buttonA.dataset.category;
+      const categoryB = buttonB.dataset.category;
+      if (categoryA != "None" && categoryB == "None") return -1;
+      if (categoryA == "None" && categoryB != "None") return 1;
+      return categoryA.localeCompare(categoryB);
+    });
+  }
+  else if (item == "Category-LowToHigh")
+  {
+    // Sort the buttons based on categories, in alphabetical order
+    buttons.sort((buttonA, buttonB) => {
+      const categoryA = buttonA.dataset.category;
+      const categoryB = buttonB.dataset.category;
+      if (categoryA != "None" && categoryB == "None") return -1;
+      if (categoryA == "None" && categoryB != "None") return 1;
+      return categoryB.localeCompare(categoryA);
+    });
+  }
+
+  const content = document.querySelector(".content");
+  buttons.forEach((button) => content.appendChild(button));
+}
+
+function checkDropdownButtons(buttons) {
+  console.log(buttons);
+  var item1 = document.getElementById("item1");
+  item1.addEventListener("click", function() {
+    sortContent("Usage-HighToLow", buttons);
+  });
+
+  var item2 = document.getElementById("item2");
+  item2.addEventListener("click", function() {
+    sortContent("Usage-LowToHigh", buttons);
+  });
+
+  var item3 = document.getElementById("item3");
+  item3.addEventListener("click", function() {
+    sortContent("Category-HighToLow", buttons);
+  });
+
+  var item4 = document.getElementById("item4");
+  item4.addEventListener("click", function() {
+    sortContent("Category-LowToHigh", buttons);
+  });
+}
+
+

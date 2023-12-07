@@ -8,6 +8,7 @@
 
     <link rel="stylesheet" href="styles.css" />
     <title>LinkTrail</title>
+    <script src="popup.js" defer></script>
     <style></style>
   </head>
   <body>
@@ -16,10 +17,20 @@
         <p>LinkTrail</p>
       </div>
       <div class="track-settings">
-        <p>Test Text</p>
+        <div class="filters-section">
+          Filters
+        </div>
+        <div class="sorting-section">
+          <button>Select an item</button>
+            <div class="dropdown-content" id="dropdownItems">
+              <a id="item1">Usage Time (High to low)</a>
+              <a id="item2">Usage Time (Low to high)</a>
+              <a id="item3">Category (Alphabetical)</a>
+              <a id="item4">Category (Reverse-Alphabetical)</a>
+            </div>
+        </div>
       </div>
       <div class="content"></div>
     </div>
-    <script src="popup.js"></script>
   </body>
 </html>

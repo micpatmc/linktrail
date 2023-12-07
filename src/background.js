@@ -37,6 +37,25 @@ function getTabInfo(tabId) {
   });
 }
 
+// Event listener for extension unload (when Chrome is closed)
+chrome.runtime.onSuspend.addListener(function () {
+  console.log("Chrome OFF");
+  loadData(function (existingData) {
+    saveData(tabData);
+  });
+
+});
+
+// Event listener for extension startup (when Chrome is opened)
+chrome.runtime.onStartup.addListener(function () {
+  // Load data when the extension starts
+  console.log("Chrome ON");
+  loadData(function (data) {
+    console.log('Extension started with data:', data);
+  });
+
+});
+
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
   const tab = await getTabInfo(activeInfo.tabId);
   if (tab.url == "") activeTabURL = extractDomainAndPath(tab.pendingUrl);
@@ -101,4 +120,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 function isActiveTab(tabURL) {
   return tabURL === activeTabURL;
+}
+
+// Sample function to save data to storage
+function saveData(data) {
+  chrome.storage.local.set({ 'usageData': data }, function () {
+    console.log('Data saved:', data);
+  });
+}
+
+// Sample function to retrieve data from storage
+function loadData(callback) {
+  chrome.storage.local.get('usageData', function (result) {
+    const data = result.usageData || [];
+    console.log('Data loaded:', data);
+    callback(data);
+  });
 }
