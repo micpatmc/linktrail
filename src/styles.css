@@ -1,14 +1,30 @@
-/* TODO: Change the background color of the header and footer */
-
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
   scroll-behavior: auto;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* IE 10 and IE 11 */
   user-select: none; /* Standard syntax */
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #141414 rgb(0, 136, 255);
+  scroll-behavior: smooth;
+}
+
+html::-webkit-scrollbar {
+  width: 0.6vw;
+}
+
+html::-webkit-scrollbar-thumb {
+  background-color: rgb(0, 136, 255);
+}
+
+html::-webkit-scrollbar-track {
+  background-color: #686868;
 }
 
 .main {
@@ -40,20 +56,45 @@
 }
 
 .filters-section {
-  background-color: #0094FF;
+  display: flex;
+  overflow-x: auto;
   height: 100%;
-  width: 60%;
+  width: 50%;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
-.sorting-section {
-  background-color: aqua;
+.filter-item {
+  min-width: 110px;
   height: 100%;
-  width: 40%;
+  text-align: center;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .sorting-section {
   position: relative;
   display: inline-block;
+  width: 50%;
+  top: 25px;
+}
+
+.sorting-section h2 {
+  font-size: 15px;
+  font-weight: 100;
+}
+
+.sorting-section p {
+  font-size: 15px;
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+.sorting-section button {
+  display: flex;
+  position: relative;
+  background-color: transparent;
+  border: none;
 }
 
 .dropdown-content {
@@ -73,11 +114,17 @@
   cursor: pointer;
 }
 
-.dropdown-content a:hover {background-color: #ddd;}
+.dropdown-content a:hover {
+  background-color: #ddd;
+}
 
-.sorting-section:hover .dropdown-content {display: block;}
+.sorting-section:hover .dropdown-content {
+  display: block;
+}
 
-.sorting-section:hover .sorting-section button {background-color: #3e8e41;}
+.sorting-section:hover .sorting-section button {
+  background-color: #3e8e41;
+}
 
 .content {
   display: flex;
@@ -163,7 +210,7 @@
   left: 60%;
   top: 70%;
   height: 7.5px;
-  background-color: #0094FF;
+  background-color: #0094ff;
   border-radius: 10px;
 }
 

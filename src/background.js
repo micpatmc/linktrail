@@ -1,6 +1,7 @@
 let activeTabURL;
 let tabData = {};
 
+// Update an individual tab for the timing
 function updateTabData(tabURL) {
   if (tabData[tabURL] && tabData[tabURL].startTime !== undefined) {
     if (isActiveTab(tabURL)) {
@@ -19,22 +20,11 @@ function updateTabData(tabURL) {
   }
 }
 
+// Update ALL tabs in tabData
 function updateAllTabs() {
   for (const tabURL in tabData) {
     updateTabData(tabURL);
   }
-}
-
-function getTabInfo(tabId) {
-  return new Promise((resolve, reject) => {
-    chrome.tabs.get(tabId, (tab) => {
-      if (chrome.runtime.lastError) {
-        reject(chrome.runtime.lastError);
-      } else {
-        resolve(tab);
-      }
-    });
-  });
 }
 
 // Event listener for extension unload (when Chrome is closed)
@@ -53,8 +43,19 @@ chrome.runtime.onStartup.addListener(function () {
   loadData(function (data) {
     console.log('Extension started with data:', data);
   });
-
 });
+
+function getTabInfo(tabId) {
+  return new Promise((resolve, reject) => {
+    chrome.tabs.get(tabId, (tab) => {
+      if (chrome.runtime.lastError) {
+        reject(chrome.runtime.lastError);
+      } else {
+        resolve(tab);
+      }
+    });
+  });
+}
 
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
   const tab = await getTabInfo(activeInfo.tabId);
@@ -122,14 +123,14 @@ function isActiveTab(tabURL) {
   return tabURL === activeTabURL;
 }
 
-// Sample function to save data to storage
+// Function to store tab data in storage
 function saveData(data) {
   chrome.storage.local.set({ 'usageData': data }, function () {
     console.log('Data saved:', data);
   });
 }
 
-// Sample function to retrieve data from storage
+// Function to retrieve tab data from storage
 function loadData(callback) {
   chrome.storage.local.get('usageData', function (result) {
     const data = result.usageData || [];

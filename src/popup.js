@@ -1,26 +1,28 @@
+// Key = Website origin; Value = Category type
 const categoryMap = new Map([
   ["chrome://newtab", "Utilities"],
   ["https://www.w3schools.com", "Education"],
 ]);
 
+// Key = Category type; Value = RGB color value
 const colorMap = new Map([
   ["Productivity", "rgb(255, 0, 0, 0.06)"],
   ["Education", "rgb(0, 255, 0, 0.06)"],
-  ["Utilities", "rgb(0, 0, 255, 0.06)"]
-])
+  ["Utilities", "rgb(0, 0, 255, 0.06)"],
+]);
 
 // Current categories:
 // Social
 // Utilities
-// Productivity 
+// Productivity
 // Finance
 // Education
 // Shopping & Food
 // Entertainment
 // Health & Fitness
 
+// Run every time the popup is opened
 document.addEventListener("DOMContentLoaded", function () {
-  
   chrome.runtime.sendMessage(
     { message: "getTabData" },
     async function (response) {
@@ -29,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Create an array to store buttons
       const buttons = [];
-      
+
       // Calculate the overall time for progress bar calculations
       for (const tabURL in response.tabData) {
         actualTotalTime += response.tabData[tabURL].totalTime / 1000;
@@ -51,7 +53,15 @@ document.addEventListener("DOMContentLoaded", function () {
       // Append the sorted buttons to the content div
       buttons.forEach((button) => content.appendChild(button));
 
-      checkDropdownButtons(buttons);
+      // Call function to check for button clicks
+      checkButtonClicks([...buttons]);
+
+      // Get the sorting data
+      chrome.storage.local.get("sortingData", function (result) {
+        sortContent(result.sortingData, buttons);
+        console.log("Data loaded:", result.sortingData);
+        callback(data);
+      });
     }
   );
 });
@@ -75,15 +85,14 @@ function createButton(tabInfo, actualTotalTime) {
   categoryParagraph.id = "category";
 
   // Fill in the category based on global map
-  if (categoryMap.has(tabInfo.origin))
-  {
+  if (categoryMap.has(tabInfo.origin)) {
     categoryParagraph.textContent = categoryMap.get(tabInfo.origin);
-    categoryButton.style.backgroundColor = colorMap.get(categoryParagraph.textContent);
-  }
-  else
-  {
+    categoryButton.style.backgroundColor = colorMap.get(
+      categoryParagraph.textContent
+    );
+  } else {
     categoryParagraph.textContent = "None";
-    categoryButton.backgroundColor = "rgb(0, 0, 0, 0.06)"
+    categoryButton.backgroundColor = "rgb(0, 0, 0, 0.06)";
   }
 
   categoryButton.appendChild(categoryParagraph);
@@ -130,7 +139,7 @@ function createButton(tabInfo, actualTotalTime) {
   progressBarBackground.style.width = `${100 / 3}%`;
 
   const progressParagraph = document.createElement("p");
-  progressParagraph.id = "progress-value"
+  progressParagraph.id = "progress-value";
   progressParagraph.textContent = progressWidth.toFixed(1) + "%";
 
   // Append the image, paragraphs, and progress bar to the button
@@ -149,33 +158,66 @@ function createButton(tabInfo, actualTotalTime) {
   return button;
 }
 
-// Handle item selection and call a function
+// Ability to set filters for buttons
+function filterContent(item, buttons) {
+  // Save the filter setting
+  chrome.storage.local.set({ filterData: item }, function () {
+    console.log("Data saved:", item);
+  });
+
+  var filteredButtons = buttons;
+
+  // Sort the buttons based on the category
+  for (let i = filteredButtons.length - 1; i >= 0; i--) {
+    if (filteredButtons[i].dataset.category !== item) {
+      filteredButtons.splice(i, 1);
+    }
+  }
+
+  const content = document.querySelector(".content");
+
+  // Remove existing buttons
+  while (content.firstChild) {
+    content.removeChild(content.firstChild);
+  }
+
+  // Place filter buttons into the DOM
+  filteredButtons.forEach((button) => content.appendChild(button));
+}
+
+// Handle button sorting
 function sortContent(item, buttons) {
+  // Save the sorting value
+  chrome.storage.local.set({ sortingData: item }, function () {
+    console.log("Data saved:", item);
+  });
 
-  console.log(buttons);
+  const sortText = document.querySelector("#sort-text");
 
-  if (item == "Usage-HighToLow")
-  {
-    console.log("Hello");
-    // Sort the buttons based on descending time
+  // Sort the buttons based on descending time
+  if (item == "Usage-HighToLow") {
+    sortText.textContent = "Usage Time (High to low)";
+
     buttons.sort((buttonA, buttonB) => {
       const timeA = buttonA.dataset.time;
       const timeB = buttonB.dataset.time;
       return timeB - timeA;
     });
   }
-  else if (item == "Usage-LowToHigh")
-  {
-    // Sort the buttons based on ascending time
+  // Sort the buttons based on ascending time
+  else if (item == "Usage-LowToHigh") {
+    sortText.textContent = "Usage Time (Low to high)";
+
     buttons.sort((buttonA, buttonB) => {
       const timeA = buttonA.dataset.time;
       const timeB = buttonB.dataset.time;
       return timeA - timeB;
     });
   }
-  else if (item == "Category-HighToLow")
-  {
-    // Sort the buttons based on categories, in alphabetical order
+  // Sort the buttons based on categories, in alphabetical order
+  else if (item == "Category-HighToLow") {
+    sortText.textContent = "Category (Alphabetical)";
+
     buttons.sort((buttonA, buttonB) => {
       const categoryA = buttonA.dataset.category;
       const categoryB = buttonB.dataset.category;
@@ -184,9 +226,10 @@ function sortContent(item, buttons) {
       return categoryA.localeCompare(categoryB);
     });
   }
-  else if (item == "Category-LowToHigh")
-  {
-    // Sort the buttons based on categories, in alphabetical order
+  // Sort the buttons based on categories, in alphabetical order
+  else if (item == "Category-LowToHigh") {
+    sortText.textContent = "Category (Reverse-Alphabetical)";
+
     buttons.sort((buttonA, buttonB) => {
       const categoryA = buttonA.dataset.category;
       const categoryB = buttonB.dataset.category;
@@ -200,27 +243,45 @@ function sortContent(item, buttons) {
   buttons.forEach((button) => content.appendChild(button));
 }
 
-function checkDropdownButtons(buttons) {
-  console.log(buttons);
+// Check if buttons are being clicked
+function checkButtonClicks(buttons) {
+  var filterProductivity = document.getElementById("filter-productivity");
+  filterProductivity.addEventListener("click", function () {
+    filterContent("Productivity", buttons);
+  });
+
+  var filterEducation = document.getElementById("filter-education");
+  filterEducation.addEventListener("click", function () {
+    filterContent("Education", buttons);
+  });
+
+  var filterUtilities = document.getElementById("filter-utilities");
+  filterUtilities.addEventListener("click", function () {
+    filterContent("Utilities", buttons);
+  });
+
+  var filterNone = document.getElementById("filter-none");
+  filterNone.addEventListener("click", function () {
+    filterContent("None", buttons);
+  });
+
   var item1 = document.getElementById("item1");
-  item1.addEventListener("click", function() {
+  item1.addEventListener("click", function () {
     sortContent("Usage-HighToLow", buttons);
   });
 
   var item2 = document.getElementById("item2");
-  item2.addEventListener("click", function() {
+  item2.addEventListener("click", function () {
     sortContent("Usage-LowToHigh", buttons);
   });
 
   var item3 = document.getElementById("item3");
-  item3.addEventListener("click", function() {
+  item3.addEventListener("click", function () {
     sortContent("Category-HighToLow", buttons);
   });
 
   var item4 = document.getElementById("item4");
-  item4.addEventListener("click", function() {
+  item4.addEventListener("click", function () {
     sortContent("Category-LowToHigh", buttons);
   });
 }
-
-
