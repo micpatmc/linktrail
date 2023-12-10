@@ -9,24 +9,26 @@
   user-select: none; /* Standard syntax */
 }
 
-html {
-  scrollbar-width: thin;
-  scrollbar-color: #141414 rgb(0, 136, 255);
-  scroll-behavior: smooth;
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 5px;
+}
+/* Track */
+::-webkit-scrollbar-track {
+ background: #f1f1f1;
 }
 
-html::-webkit-scrollbar {
-  width: 0.6vw;
+/* Handle */
+::-webkit-scrollbar-thumb {
+ background: #bec4c4;
 }
 
-html::-webkit-scrollbar-thumb {
-  background-color: rgb(0, 136, 255);
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
-
-html::-webkit-scrollbar-track {
-  background-color: #686868;
-}
-
 .main {
   width: 600px;
   height: 600px;
@@ -45,6 +47,14 @@ html::-webkit-scrollbar-track {
   border-bottom: 1px solid rgb(0, 0, 0, 0.08);
 }
 
+.chart-section {
+  position: absolute;
+  top: 10%;
+  width: 50%;
+  height: 40%;
+  left: 0;
+}
+
 .track-settings {
   position: absolute;
   display: flex;
@@ -60,22 +70,29 @@ html::-webkit-scrollbar-track {
   overflow-x: auto;
   height: 100%;
   width: 50%;
-  padding-left: 10px;
-  padding-right: 10px;
+  align-content: center;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 .filter-item {
-  min-width: 110px;
-  height: 100%;
+  position: relative;
+  top: 10px;
+  min-width: 100px;
+  height: 70%;
   text-align: center;
   margin-left: 10px;
   margin-right: 10px;
+  border: 1px solid black;
+  background-color: white;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.40);
 }
 
 .sorting-section {
   position: relative;
   display: inline-block;
-  width: 50%;
+  width: 40%;
   top: 25px;
 }
 
@@ -85,7 +102,7 @@ html::-webkit-scrollbar-track {
 }
 
 .sorting-section p {
-  font-size: 15px;
+  font-size: 13px;
   text-decoration: underline;
   text-underline-offset: 5px;
 }

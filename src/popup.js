@@ -245,6 +245,7 @@ function sortContent(item, buttons) {
 
 // Check if buttons are being clicked
 function checkButtonClicks(buttons) {
+
   var filterProductivity = document.getElementById("filter-productivity");
   filterProductivity.addEventListener("click", function () {
     filterContent("Productivity", buttons);
