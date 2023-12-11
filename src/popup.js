@@ -23,7 +23,6 @@ const colorMap = new Map([
 
 // Run every time the popup is opened
 document.addEventListener("DOMContentLoaded", function () {
-  createChart();
   chrome.runtime.sendMessage(
     { message: "getTabData" },
     async function (response) {
@@ -56,6 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Call function to check for button clicks
       checkButtonClicks([...buttons]);
+      createChart([...buttons]);
 
       // Get the sorting data
       chrome.storage.local.get("sortingData", function (result) {
@@ -67,64 +67,43 @@ document.addEventListener("DOMContentLoaded", function () {
   );
 });
 
-function createChart() {
- // Check if Chart object is defined
- console.log("HERE");
- if (typeof Chart === 'undefined') {
-  console.log('Chart.js is not loaded. Check your paths and ensure it is included.');
-  return;
-}
-// Get the canvas element
-var canvas = document.getElementById('myChart');
-if (!canvas) {
-  console.log('Canvas element with ID "myChart" not found.');
-  return;
+function createChart(buttons) {
+  // Get the canvas element
+  var ctx = document.getElementById('myChart').getContext('2d');
+
+  // Data for the chart
+  var data = {
+    labels: buttons.map(function(button) {
+      return button.dataset.name;
+    }),
+    datasets: [{
+      data: buttons.map(function(button) {
+        return button.dataset.progress;
+      }),
+      backgroundColor: buttons.map(function(button) {
+        return button.dataset.color;
+      }),
+      hoverBackgroundColor: buttons.map(function(button) {
+        return button.dataset.lightColor;
+      }),
+    }]
+  };
+
+  // Chart configuration
+  var options = {
+    cutout: 50,
+    responsive: true,
+    maintainAspectRatio: false,
+  };
+
+  // Create the doughnut chart
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: data,
+    options: options
+  });
 }
 
-// Get the 2D context
-var ctx = canvas.getContext('2d');
-if (!ctx) {
-  console.log('Unable to get 2D context for canvas.');
-  return;
-}
-
-var myChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-        datasets: [{
-            label: '# of Votes',
-            data: [12, 19, 3, 5, 2, 3],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
-            ],
-            borderColor: [
-                'rgba(255,99,132,1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero:true
-                }
-            }]
-        }
-    }
-});
-}
 
 function createButton(tabInfo, actualTotalTime) {
   // Create the button
@@ -214,6 +193,11 @@ function createButton(tabInfo, actualTotalTime) {
   // Set time to sort with
   button.dataset.time = tabInfo.totalTime;
   button.dataset.category = categoryParagraph.textContent;
+  button.dataset.name = nameParagraph.textContent;
+  button.dataset.progress = progressWidth.toFixed(1);
+  button.dataset.color = getRandomColor();
+  button.dataset.lightColor = getLighterColor(button.dataset.color, 20);
+  console.log(getLighterColor(button.dataset.color, 20));
 
   return button;
 }
@@ -353,3 +337,39 @@ function checkButtonClicks(buttons) {
     sortContent("Category-LowToHigh", filteredButtons);
   });
 }
+
+function getRandomColor() {
+  return '#' + Math.floor(Math.random()*16777215).toString(16);
+}
+
+function getLighterColor(color, percent) {
+  percent = Math.min(100, Math.max(0, percent));
+
+  // Convert hex to RGB
+  var r = parseInt(color.slice(1, 3), 16);
+  var g = parseInt(color.slice(3, 5), 16);
+  var b = parseInt(color.slice(5, 7), 16);
+
+  // Calculate lighter RGB values
+  r = Math.floor(r + (255 - r) * (percent / 100));
+  g = Math.floor(g + (255 - g) * (percent / 100));
+  b = Math.floor(b + (255 - b) * (percent / 100));
+
+  // Ensure values are within the valid range (0-255)
+  r = Math.min(255, r);
+  g = Math.min(255, g);
+  b = Math.min(255, b);
+
+  // Convert back to hex
+  var lighterColor = '#' + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
+
+  return lighterColor;
+}
+
+
+// Example usage:
+var randomColor = getRandomColor();
+var lighterColor = getLighterColor(randomColor, 20);
+
+console.log('Random Color:', randomColor);
+console.log('Lighter Color:', lighterColor);
