@@ -8,8 +8,8 @@
 
     <link rel="stylesheet" href="styles.css" />
     <title>LinkTrail</title>
-    <script src="popup.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style></style>
   </head>
   <body>
@@ -18,7 +18,7 @@
         <p>LinkTrail</p>
       </div>
       <div class="chart-section">
-        <canvas id="myChart"></canvas>
+        <canvas id="myChart" height="200" width="400"></canvas>
       </div>
       <div class="track-settings">
         <div class="filters-section">
@@ -29,38 +29,16 @@
         </div>
         <div class="sorting-section">
           <button><h2>Sort by: &nbsp;</h2><p id="sort-text"></p></button>
-            <div class="dropdown-content" id="dropdownItems">
-              <a id="item1">Usage Time (High to low)</a>
-              <a id="item2">Usage Time (Low to high)</a>
-              <a id="item3">Category (Alphabetical)</a>
-              <a id="item4">Category (Reverse-Alphabetical)</a>
-            </div>
+          <div class="dropdown-content" id="dropdownItems">
+            <a id="item1">Usage Time (High to low)</a>
+            <a id="item2">Usage Time (Low to high)</a>
+            <a id="item3">Category (Alphabetical)</a>
+            <a id="item4">Category (Reverse-Alphabetical)</a>
+          </div>
         </div>
       </div>
       <div class="content"></div>
     </div>
-
-    <script>
-      const ctx = document.getElementById('myChart');
-    
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-          datasets: [{
-            label: '# of Votes',
-            data: [12, 19, 3, 5, 2, 3],
-            borderWidth: 1
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
-    </script>
+    <script src="popup.js" defer></script>
   </body>
 </html>

@@ -23,6 +23,7 @@ const colorMap = new Map([
 
 // Run every time the popup is opened
 document.addEventListener("DOMContentLoaded", function () {
+  createChart();
   chrome.runtime.sendMessage(
     { message: "getTabData" },
     async function (response) {
@@ -65,6 +66,65 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   );
 });
+
+function createChart() {
+ // Check if Chart object is defined
+ console.log("HERE");
+ if (typeof Chart === 'undefined') {
+  console.log('Chart.js is not loaded. Check your paths and ensure it is included.');
+  return;
+}
+// Get the canvas element
+var canvas = document.getElementById('myChart');
+if (!canvas) {
+  console.log('Canvas element with ID "myChart" not found.');
+  return;
+}
+
+// Get the 2D context
+var ctx = canvas.getContext('2d');
+if (!ctx) {
+  console.log('Unable to get 2D context for canvas.');
+  return;
+}
+
+var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+        datasets: [{
+            label: '# of Votes',
+            data: [12, 19, 3, 5, 2, 3],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255,99,132,1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
+}
 
 function createButton(tabInfo, actualTotalTime) {
   // Create the button
@@ -183,6 +243,9 @@ function filterContent(item, buttons) {
 
   // Place filter buttons into the DOM
   filteredButtons.forEach((button) => content.appendChild(button));
+
+  // Return the filtered buttons
+  return buttons;
 }
 
 // Handle button sorting
@@ -239,6 +302,7 @@ function sortContent(item, buttons) {
     });
   }
 
+  // Place buttons into the DOM
   const content = document.querySelector(".content");
   buttons.forEach((button) => content.appendChild(button));
 }
@@ -246,43 +310,46 @@ function sortContent(item, buttons) {
 // Check if buttons are being clicked
 function checkButtonClicks(buttons) {
 
+  // Set filteredButtons for when we want to sort with a filter on
+  var filteredButtons = buttons;
+
   var filterProductivity = document.getElementById("filter-productivity");
   filterProductivity.addEventListener("click", function () {
-    filterContent("Productivity", buttons);
+    filteredButtons = filterContent("Productivity", [...buttons]);
   });
 
   var filterEducation = document.getElementById("filter-education");
   filterEducation.addEventListener("click", function () {
-    filterContent("Education", buttons);
+    filteredButtons = filterContent("Education", [...buttons]);
   });
 
   var filterUtilities = document.getElementById("filter-utilities");
   filterUtilities.addEventListener("click", function () {
-    filterContent("Utilities", buttons);
+    filteredButtons = filterContent("Utilities", [...buttons]);
   });
 
   var filterNone = document.getElementById("filter-none");
   filterNone.addEventListener("click", function () {
-    filterContent("None", buttons);
+    filteredButtons = filterContent("None", [...buttons]);
   });
 
   var item1 = document.getElementById("item1");
   item1.addEventListener("click", function () {
-    sortContent("Usage-HighToLow", buttons);
+    sortContent("Usage-HighToLow", filteredButtons);
   });
 
   var item2 = document.getElementById("item2");
   item2.addEventListener("click", function () {
-    sortContent("Usage-LowToHigh", buttons);
+    sortContent("Usage-LowToHigh", filteredButtons);
   });
 
   var item3 = document.getElementById("item3");
   item3.addEventListener("click", function () {
-    sortContent("Category-HighToLow", buttons);
+    sortContent("Category-HighToLow", filteredButtons);
   });
 
   var item4 = document.getElementById("item4");
   item4.addEventListener("click", function () {
-    sortContent("Category-LowToHigh", buttons);
+    sortContent("Category-LowToHigh", filteredButtons);
   });
 }
