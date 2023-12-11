@@ -22,19 +22,12 @@ function updateTabData(tabURL) {
 
 // Update ALL tabs in tabData
 function updateAllTabs() {
+  saveData(tabData);
+
   for (const tabURL in tabData) {
     updateTabData(tabURL);
   }
 }
-
-// Event listener for extension unload (when Chrome is closed)
-chrome.runtime.onSuspend.addListener(function () {
-  console.log("Chrome OFF");
-  loadData(function (existingData) {
-    saveData(tabData);
-  });
-
-});
 
 // Event listener for extension startup (when Chrome is opened)
 chrome.runtime.onStartup.addListener(function () {

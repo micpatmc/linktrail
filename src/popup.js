@@ -2,6 +2,15 @@
 const categoryMap = new Map([
   ["chrome://newtab", "Utilities"],
   ["https://www.w3schools.com", "Education"],
+  ["https://trello.com", "Productivity"],
+  ["https://search.google.com", "Utilities"],
+  ["https://planyway.com", "Productivity"],
+  ["https://jobs.careers.microsoft.com", "Productivity"],
+  ["https://github.com", "Utilities"],
+  ["http://getlinktrail.com", "Utilities"],
+  ["https://docs.google.com", "Utilities"],
+  ["https://calendar.google.com", "Utilities"],
+  ["https://analytics.google.com", "Utilities"],
 ]);
 
 // Key = Category type; Value = RGB color value
@@ -12,13 +21,13 @@ const colorMap = new Map([
 ]);
 
 // Current categories:
-// Social
 // Utilities
 // Productivity
-// Finance
 // Education
-// Shopping & Food
+// Finance
+// Social
 // Entertainment
+// Shopping & Food
 // Health & Fitness
 
 // Run every time the popup is opened
@@ -71,6 +80,13 @@ function createChart(buttons) {
   // Get the canvas element
   var ctx = document.getElementById('myChart').getContext('2d');
 
+  buttons.sort((buttonA, buttonB) => {
+    const timeA = buttonA.dataset.time;
+    const timeB = buttonB.dataset.time;
+    return timeB - timeA;
+  });
+  buttons = buttons.slice(0, 10);
+
   // Data for the chart
   var data = {
     labels: buttons.map(function(button) {
@@ -94,6 +110,14 @@ function createChart(buttons) {
     cutout: 50,
     responsive: true,
     maintainAspectRatio: false,
+
+    plugins: {
+      legend: {
+        position: 'right',
+        maxHeight: 10,
+        align: 'right'
+      }
+    }
   };
 
   // Create the doughnut chart
