@@ -13,6 +13,29 @@ const categoryMap = new Map([
   ["https://analytics.google.com", "Utilities"],
 ]);
 
+const categoryTimeMap = new Map([
+  ["Productivity", 0],
+  ["Education", 0],
+  ["Utilities", 0],
+  ["Finance", 0],
+  ["Social", 0],
+  ["Entertainment", 0],
+  ["Shopping & Food", 0],
+  ["Health & Fitness", 0],
+])
+
+const categoryQuantityMap = new Map([
+  ["Productivity", 0],
+  ["Education", 0],
+  ["Utilities", 0],
+  ["Finance", 0],
+  ["Social", 0],
+  ["Entertainment", 0],
+  ["Shopping & Food", 0],
+  ["Health & Fitness", 0],
+])
+
+
 // Key = Category type; Value = RGB color value
 const colorMap = new Map([
   ["Productivity", "rgb(255, 0, 0, 0.06)"],
@@ -21,9 +44,9 @@ const colorMap = new Map([
 ]);
 
 // Current categories:
-// Utilities
 // Productivity
 // Education
+// Utilities
 // Finance
 // Social
 // Entertainment
@@ -36,20 +59,20 @@ document.addEventListener("DOMContentLoaded", function () {
     { message: "getTabData" },
     async function (response) {
       const content = document.querySelector(".content");
-      var actualTotalTime = 0;
+      var totalTime = 0;
 
       // Create an array to store buttons
       const buttons = [];
 
       // Calculate the overall time for progress bar calculations
       for (const tabURL in response.tabData) {
-        actualTotalTime += response.tabData[tabURL].totalTime / 1000;
+        totalTime += response.tabData[tabURL].usageTime / 1000;
       }
 
       // Create buttons to add into array
       for (const tabURL in response.tabData) {
         const tabInfo = response.tabData[tabURL];
-        buttons.push(createButton(tabInfo, actualTotalTime));
+        buttons.push(createButton(tabInfo, totalTime));
       }
 
       // Sort the buttons based on time
@@ -64,7 +87,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Call function to check for button clicks
       checkButtonClicks([...buttons]);
+      
+      // Create the initial doughnut chart
       createChart([...buttons]);
+    
+      // Set the statistics
+      setStatistics([...buttons], totalTime);
 
       // Get the sorting data
       chrome.storage.local.get("sortingData", function (result) {
@@ -90,6 +118,12 @@ function createChart(buttons) {
   // Data for the chart
   var data = {
     labels: buttons.map(function(button) {
+      if (button.dataset.name.length > 17)
+      {
+        var truncatedName = button.dataset.name.substring(0, 18) + "...";
+        return truncatedName;
+      }
+
       return button.dataset.name;
     }),
     datasets: [{
@@ -115,7 +149,6 @@ function createChart(buttons) {
       legend: {
         position: 'right',
         maxHeight: 10,
-        align: 'right'
       }
     }
   };
@@ -129,7 +162,7 @@ function createChart(buttons) {
 }
 
 
-function createButton(tabInfo, actualTotalTime) {
+function createButton(tabInfo, totalTime) {
   // Create the button
   const button = document.createElement("button");
   button.className = "content-button";
@@ -153,6 +186,9 @@ function createButton(tabInfo, actualTotalTime) {
     categoryButton.style.backgroundColor = colorMap.get(
       categoryParagraph.textContent
     );
+
+    categoryTimeMap.set(categoryParagraph.textContent, categoryTimeMap.get(categoryParagraph.textContent) + tabInfo.usageTime);
+    categoryQuantityMap.set(categoryParagraph.textContent, categoryQuantityMap.get(categoryParagraph.textContent) + 1);
   } else {
     categoryParagraph.textContent = "None";
     categoryButton.backgroundColor = "rgb(0, 0, 0, 0.06)";
@@ -173,7 +209,7 @@ function createButton(tabInfo, actualTotalTime) {
   nameParagraph.textContent = tabInfo.url;
 
   // Convert seconds into hours, minutes, and seconds
-  const totalSeconds = tabInfo.totalTime / 1000;
+  const totalSeconds = tabInfo.usageTime / 1000;
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = Math.floor(totalSeconds % 60);
@@ -194,7 +230,7 @@ function createButton(tabInfo, actualTotalTime) {
   // Create the progress bar
   const progressBar = document.createElement("div");
   progressBar.className = "progress-bar";
-  const progressWidth = (tabInfo.totalTime / 1000 / actualTotalTime) * 100;
+  const progressWidth = (tabInfo.usageTime / 1000 / totalTime) * 100;
   progressBar.style.width = `${progressWidth / 3}%`;
 
   const progressBarBackground = document.createElement("div");
@@ -215,13 +251,12 @@ function createButton(tabInfo, actualTotalTime) {
   button.appendChild(progressParagraph);
 
   // Set time to sort with
-  button.dataset.time = tabInfo.totalTime;
+  button.dataset.time = tabInfo.usageTime;
   button.dataset.category = categoryParagraph.textContent;
   button.dataset.name = nameParagraph.textContent;
   button.dataset.progress = progressWidth.toFixed(1);
   button.dataset.color = getRandomColor();
   button.dataset.lightColor = getLighterColor(button.dataset.color, 20);
-  console.log(getLighterColor(button.dataset.color, 20));
 
   return button;
 }
@@ -362,6 +397,47 @@ function checkButtonClicks(buttons) {
   });
 }
 
+function setStatistics(buttons, totalTime) {
+  const totalTimeStat = document.getElementById("stat-total-time");
+  const sessionCountStat = document.getElementById("stat-session-count");
+  const usageStat = document.getElementById("stat-usage");
+  const usageCategoryStat = document.getElementById("stat-usage-category");
+  const quantityCategoryStat = document.getElementById("stat-quantity-category");
+
+  // Total time stat
+  const totalSeconds = totalTime;
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = Math.floor(totalSeconds % 60);
+
+  if (hours > 0)
+    totalTimeStat.textContent = `${hours.toString().padStart(2, "0")}h ${minutes
+      .toString()
+      .padStart(2, "0")}m ${seconds.toString().padStart(2, "0")}s`;
+  else if (minutes > 0)
+    totalTimeStat.textContent = `${minutes
+      .toString()
+      .padStart(2, "0")}m ${seconds.toString().padStart(2, "0")}s`;
+  else totalTimeStat.textContent = `${seconds.toString().padStart(2, "0")}s`;
+  
+  // Usage stat
+  buttons.sort((buttonA, buttonB) => {
+    const timeA = buttonA.dataset.time;
+    const timeB = buttonB.dataset.time;
+    return timeB - timeA;
+  });
+  console.log(categoryTimeMap);
+  usageStat.textContent = buttons[0].dataset.name;
+
+  // Usage category stat
+  const usageKey = Array.from(categoryTimeMap.entries()).reduce((a, b) => (b[1] > a[1] ? b : a))[0];
+  usageCategoryStat.textContent = usageKey;
+
+  // Quantity category stat
+  const quantityKey = Array.from(categoryQuantityMap.entries()).reduce((a, b) => (b[1] > a[1] ? b : a))[0];
+  quantityCategoryStat.textContent = quantityKey;
+}
+
 function getRandomColor() {
   return '#' + Math.floor(Math.random()*16777215).toString(16);
 }
@@ -390,10 +466,8 @@ function getLighterColor(color, percent) {
   return lighterColor;
 }
 
-
-// Example usage:
-var randomColor = getRandomColor();
-var lighterColor = getLighterColor(randomColor, 20);
-
-console.log('Random Color:', randomColor);
-console.log('Lighter Color:', lighterColor);
+function saveData(data) {
+  chrome.storage.local.set({ 'test': data }, function () {
+    console.log('Data saved:', data);
+  });
+}

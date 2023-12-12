@@ -46,17 +46,98 @@
   border-bottom: 1px solid rgb(0, 0, 0, 0.08);
 }
 
-.chart-section {
-  position: absolute;
-  top: 15%;
-  width: 70%;
-  height: 40%;
-  left: 10px;
+.header p {
+  position: relative;
+  left: 15px;
+  color: black;
+  font-size: 20px;
+  font-weight: 700;
 }
 
-#myChart {
-  width: 100px;
-  height: 100px;
+.header a {
+  display: flex;
+  position: absolute;
+  border: none;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  background-color: #0094ff;
+  color: white;
+  width: 90px;
+  height: 30px;
+  right: 15px;
+  font-size: 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.header a:hover {
+  background-color: #6dc2ff;
+}
+
+.navbar {
+  position: absolute;
+  top: 7.5%;
+  height: 7.5%;
+  width: 100%;
+}
+
+.analytics-section {
+  position: absolute;
+
+  /* TODO: For navbar, use these measurements */
+  /* top: 15%;
+  width: 100%;
+  height: 40%; */
+
+  top: 7.5%;
+  width: 100%;
+  height: 47.5%;
+}
+
+.chart-section {
+  position: absolute;
+  width: 58.5%;
+  height: 100%;
+  left: 1.5%;
+}
+
+.stat-section {
+  display: flex;
+  position: absolute;
+  width: 40%;
+  height: 100%;
+  right: 0%;
+  justify-content: center;
+  align-items: center;
+}
+
+.stat-content {
+  position: absolute;
+  width: 90%;
+  height: 90%;
+  background-color: rgb(217, 217, 217, 0.15);
+  border-radius: 5%;
+}
+
+.stat-content div {
+  position: relative;
+  left: 5%;
+  top: 5%;
+  right: 0;
+  width: 90%;
+  height: 25%;
+}
+
+.stat-content h2 {
+  font-size: 14px;
+  font-weight: 100;
+  color: rgb(0, 0, 0, 0.6);
+}
+
+.stat-content p {
+  font-size: 18px;
 }
 
 .track-settings {
@@ -66,7 +147,7 @@
   height: 10%;
   margin-top: 55%;
   border-top: 1px solid rgb(0, 0, 0, 0.08);
-  border-bottom: 1px solid rgb(0, 0, 0, 0.08);
+  background-color: rgb(0, 0, 0, 0.015);
 }
 
 .filters-section {
@@ -87,10 +168,15 @@
   text-align: center;
   margin-left: 10px;
   margin-right: 10px;
-  border: 1px solid black;
   background-color: white;
   border-radius: 10px;
   border: 1px solid rgba(0, 0, 0, 0.40);
+  transition: all 0.3 ease-in-out;
+  cursor: pointer;
+}
+
+.filter-item:hover {
+  background-color: rgb(0, 0, 0, 0.2);
 }
 
 .sorting-section {
@@ -180,14 +266,6 @@
 
 .content-button:hover {
   background-color: aliceblue;
-}
-
-.header p {
-  position: relative;
-  left: 15px;
-  color: black;
-  font-size: 20px;
-  font-weight: 700;
 }
 
 .category-button {

@@ -12,7 +12,7 @@ function updateTabData(tabURL) {
         tabData[tabURL].startTime = currentTime;
       }
 
-      tabData[tabURL].totalTime += currentTime - tabData[tabURL].startTime;
+      tabData[tabURL].usageTime += currentTime - tabData[tabURL].startTime;
       tabData[tabURL].startTime = currentTime;
     } else {
       tabData[tabURL].startTime = Date.now(); // Pause the timer if the tab is not active
@@ -32,7 +32,7 @@ function updateAllTabs() {
 // Event listener for extension startup (when Chrome is opened)
 chrome.runtime.onStartup.addListener(function () {
   // Load data when the extension starts
-  console.log("Chrome ON");
+  console.log("Chrome has started");
   loadData(function (data) {
     console.log('Extension started with data:', data);
   });
@@ -59,7 +59,7 @@ chrome.tabs.onActivated.addListener(async (activeInfo) => {
     tabData[activeTabURL] = {
       url: activeTabURL,
       startTime: Date.now(),
-      totalTime: 0,
+      usageTime: 0,
       origin: new URL(tab.url).origin,
       favicon: tab.favIconUrl,
     };
@@ -77,7 +77,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       tabData[shortenedURL] = {
         url: shortenedURL,
         startTime: Date.now(),
-        totalTime: 0,
+        usageTime: 0,
         origin: new URL(tab.url).origin,
         favicon: tab.favIconUrl,
       };
@@ -126,8 +126,8 @@ function saveData(data) {
 // Function to retrieve tab data from storage
 function loadData(callback) {
   chrome.storage.local.get('usageData', function (result) {
-    const data = result.usageData || [];
-    console.log('Data loaded:', data);
-    callback(data);
+    tabData = result.usageData || [];
+    console.log('Data loaded:', tabData);
+    callback(tabData);
   });
 }

@@ -7,28 +7,61 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css" />
     <title>LinkTrail</title>
+    <!-- Chart.js reference -->
     <script src="./chart.umd.js"></script>
     <script src="popup.js" defer></script>
     <style></style>
   </head>
   <body>
     <div class="main">
+      <!-- Header section -->
       <div class="header">
         <p>LinkTrail</p>
+        <a href="http://getlinktrail.com" target="_blank">Website</a>
       </div>
-      <div class="chart-section">
-        <canvas id="myChart"></canvas>
+      <!-- Navbar -->
+      <div class="navbar"></div>
+      <!-- Middle/Analytics section -->
+      <div class="analytics-section">
+        <div class="chart-section">
+          <canvas id="myChart"></canvas>
+        </div>
+        <div class="stat-section">
+          <div class="stat-content">
+            <div>
+              <h2>Total Time</h2>
+              <p id="stat-total-time"></p>
+            </div>
+            <!-- <div>
+              <h2>Session Count</h2>
+              <p id="stat-session-count">--</p>
+            </div> -->
+            <div>
+              <h2>Highest Usage</h2>
+              <p id="stat-usage"></p>
+            </div>
+            <div>
+              <h2>Highest Usage (Category)</h2>
+              <p id="stat-usage-category"></p>
+            </div>
+            <div>
+              <h2>Highest Quantity (Category)</h2>
+              <p id="stat-quantity-category">--</p>
+            </div>
+          </div>
+        </div>
       </div>
+      <!-- Filter/Sort features -->
       <div class="track-settings">
         <div class="filters-section">
           <button class="filter-item" id="filter-productivity">Productivity</button>
           <button class="filter-item" id="filter-education">Education</button>
           <button class="filter-item" id="filter-utilities">Utilities</button>
-          <button class="filter-item" id="filter-utilities">Finance</button>
-          <button class="filter-item" id="filter-utilities">Social</button>
-          <button class="filter-item" id="filter-utilities">Entertainment</button>
-          <button class="filter-item" id="filter-utilities">Shopping & Food</button>
-          <button class="filter-item" id="filter-utilities">Health & Fitness</button>
+          <button class="filter-item" id="filter-finance">Finance</button>
+          <button class="filter-item" id="filter-social">Social</button>
+          <button class="filter-item" id="filter-entertainment">Entertainment</button>
+          <button class="filter-item" id="filter-shopping-food">Shopping & Food</button>
+          <button class="filter-item" id="filter-health-fitness">Health & Fitness</button>
           <button class="filter-item" id="filter-none">None</button>
         </div>
         <div class="sorting-section">
@@ -41,6 +74,7 @@
           </div>
         </div>
       </div>
+      <!-- Usage content -->
       <div class="content"></div>
     </div>
   </body>

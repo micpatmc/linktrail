@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
   "name": "LinkTrail",
+  "description": "Allows you to track website usage, see where you spend your time, and make plans for the future based on your needs.",
   "version": "1.0",
-  "permissions": ["storage", "activeTab", "tabs"],
+  "permissions": ["storage", "tabs"],
   "background": {
     "service_worker": "./src/background.js"
   },
@@ -14,5 +15,11 @@
   ],
   "action": {
     "default_popup": "./src/popup.html"
+  },
+  "icons": {
+    "16": "./public/icon16.png",
+    "32": "./public/icon32.png",
+    "128": "./public/icon128.png",
+    "256": "./public/icon256.png"
   }
 }
