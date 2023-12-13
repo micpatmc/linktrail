@@ -426,8 +426,11 @@ function setStatistics(buttons, totalTime) {
     const timeB = buttonB.dataset.time;
     return timeB - timeA;
   });
-  console.log(categoryTimeMap);
-  usageStat.textContent = buttons[0].dataset.name;
+
+  if (buttons[0].dataset.name.length >= 21)
+    usageStat.textContent = buttons[0].dataset.name.substring(0, 22) + "...";
+  else
+    usageStat.textContent = buttons[0].dataset.name;
 
   // Usage category stat
   const usageKey = Array.from(categoryTimeMap.entries()).reduce((a, b) => (b[1] > a[1] ? b : a))[0];
