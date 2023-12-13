@@ -134,7 +134,7 @@ function createChart(buttons) {
         return button.dataset.color;
       }),
       hoverBackgroundColor: buttons.map(function(button) {
-        return button.dataset.lightColor;
+        return getLighterColor(button.dataset.color, 20);
       }),
     }]
   };
@@ -250,13 +250,27 @@ function createButton(tabInfo, totalTime) {
   button.appendChild(timeParagraph);
   button.appendChild(progressParagraph);
 
-  // Set time to sort with
+  // Set button data
   button.dataset.time = tabInfo.usageTime;
   button.dataset.category = categoryParagraph.textContent;
   button.dataset.name = nameParagraph.textContent;
   button.dataset.progress = progressWidth.toFixed(1);
-  button.dataset.color = getRandomColor();
-  button.dataset.lightColor = getLighterColor(button.dataset.color, 20);
+  
+  const storedData = localStorage.getItem(button.dataset.name + " : Color");
+  console.log(storedData);
+  if (storedData === null)
+  {
+    console.log("HERE");
+    button.dataset.color = getRandomColor();
+    localStorage.setItem(button.dataset.name + " : Color", JSON.stringify(button.dataset.color));
+    
+    // button.dataset.lightColor = getLighterColor(button.dataset.color, 20);
+    // localStorage.setItem(button.nameParagraph.content + " : Light Color", JSON.stringify(button.dataset.color));
+  }
+  else
+  {
+    button.dataset.color = JSON.parse(localStorage.getItem(button.dataset.name + " : Color"));
+  }
 
   return button;
 }
@@ -442,7 +456,12 @@ function setStatistics(buttons, totalTime) {
 }
 
 function getRandomColor() {
-  return '#' + Math.floor(Math.random()*16777215).toString(16);
+  var letters = 'ABCDE'.split('');
+  var color = '#';
+  for (var i = 0; i < 6; i++ ) {
+      color += letters[Math.floor(Math.random() * letters.length)];
+  }
+  return color;
 }
 
 function getLighterColor(color, percent) {
