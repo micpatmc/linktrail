@@ -85,17 +85,24 @@ document.addEventListener("DOMContentLoaded", function () {
       // Append the sorted buttons to the content div
       buttons.forEach((button) => content.appendChild(button));
 
+      if (buttons.length == 0) {
+        zeroButtons();
+        return;
+      } 
+      
       // Call function to check for button clicks
       checkButtonClicks([...buttons]);
       
       // Create the initial doughnut chart
       createChart([...buttons]);
-    
+      
       // Set the statistics
       setStatistics([...buttons], totalTime);
 
       // Get the sorting data
       chrome.storage.local.get("sortingData", function (result) {
+        const sortKey = result.sortingData | "Usage-HighToLow";
+        console.log(sortKey);
         sortContent(result.sortingData, buttons);
         console.log("Data loaded:", result.sortingData);
         callback(data);
@@ -491,5 +498,15 @@ function getLighterColor(color, percent) {
 function saveData(data) {
   chrome.storage.local.set({ 'test': data }, function () {
     console.log('Data saved:', data);
+  });
+}
+
+function zeroButtons() {
+  document.querySelector(".main").style.display = "none";
+  document.querySelector(".main-no-button").style.display = "flex";
+  document.querySelector("#sort-text").textContent = "Usage-HighToLow";
+
+  chrome.storage.local.set({ sortingData: "Usage-HighToLow" }, function () {
+    console.log("Data saved:", "Usage-HighToLow");
   });
 }

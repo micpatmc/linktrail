@@ -13,12 +13,15 @@
     <style></style>
   </head>
   <body>
-    <div class="main">
       <!-- Header section -->
       <div class="header">
         <p>LinkTrail</p>
         <a href="http://getlinktrail.com" target="_blank">Website</a>
       </div>
+      <div class="main-no-button">
+        <p id="content-start-text">Open up a new tab to start tracking.</p>
+      </div>
+      <div class="main">
       <!-- Navbar -->
       <div class="navbar"></div>
       <!-- Middle/Analytics section -->
@@ -30,19 +33,15 @@
           <div class="stat-content">
             <div>
               <h2>Total Time</h2>
-              <p id="stat-total-time"></p>
+              <p id="stat-total-time">--</p>
             </div>
-            <!-- <div>
-              <h2>Session Count</h2>
-              <p id="stat-session-count">--</p>
-            </div> -->
             <div>
               <h2>Highest Usage</h2>
-              <p id="stat-usage"></p>
+              <p id="stat-usage">--</p>
             </div>
             <div>
               <h2>Highest Usage (Category)</h2>
-              <p id="stat-usage-category"></p>
+              <p id="stat-usage-category">--</p>
             </div>
             <div>
               <h2>Highest Quantity (Category)</h2>
@@ -75,7 +74,8 @@
         </div>
       </div>
       <!-- Usage content -->
-      <div class="content"></div>
+      <div class="content">
+      </div>
     </div>
   </body>
 </html>
