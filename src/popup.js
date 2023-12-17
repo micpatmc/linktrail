@@ -89,23 +89,31 @@ document.addEventListener("DOMContentLoaded", function () {
         zeroButtons();
         return;
       } 
+
+      var filteredButtons = [];
+
+      // Get the filter data and assign filtered buttons
+      chrome.storage.local.get("filterData", function (result) {
+        result.filterData.forEach((filter) => filteredButtons = toggleFilter("filter-" + filter, [...buttons]));
+        callback(result);
+      })
       
       // Call function to check for button clicks
-      checkButtonClicks([...buttons]);
+      checkButtonClicks([...buttons], filteredButtons);
       
       // Create the initial doughnut chart
       createChart([...buttons]);
       
       // Set the statistics
       setStatistics([...buttons], totalTime);
-
-      // Get the sorting data
+      
+      // Get the sorting data and place buttons
       chrome.storage.local.get("sortingData", function (result) {
         const sortKey = result.sortingData | "Usage-HighToLow";
         console.log(sortKey);
-        sortContent(result.sortingData, buttons);
+        sortContent(result.sortingData, filteredButtons);
         console.log("Data loaded:", result.sortingData);
-        callback(data);
+        callback(result);
       });
     }
   );
@@ -291,10 +299,13 @@ function filterContent(item, buttons) {
 
   var filteredButtons = buttons;
 
-  // Sort the buttons based on the category
-  for (let i = filteredButtons.length - 1; i >= 0; i--) {
-    if (filteredButtons[i].dataset.category !== item) {
-      filteredButtons.splice(i, 1);
+  if (item.length > 0)
+  {
+    // Sort the buttons based on the category
+    for (let i = filteredButtons.length - 1; i >= 0; i--) {
+      if (!item.includes(filteredButtons[i].dataset.category.toLowerCase())) {
+        filteredButtons.splice(i, 1);
+      }
     }
   }
 
@@ -372,29 +383,51 @@ function sortContent(item, buttons) {
 }
 
 // Check if buttons are being clicked
-function checkButtonClicks(buttons) {
-
-  // Set filteredButtons for when we want to sort with a filter on
-  var filteredButtons = buttons;
+function checkButtonClicks(buttons, filteredButtons) {
 
   var filterProductivity = document.getElementById("filter-productivity");
   filterProductivity.addEventListener("click", function () {
-    filteredButtons = filterContent("Productivity", [...buttons]);
+    filteredButtons = toggleFilter("filter-productivity", [...buttons]);
   });
 
   var filterEducation = document.getElementById("filter-education");
   filterEducation.addEventListener("click", function () {
-    filteredButtons = filterContent("Education", [...buttons]);
+    filteredButtons = toggleFilter("filter-education", [...buttons]);
   });
 
   var filterUtilities = document.getElementById("filter-utilities");
   filterUtilities.addEventListener("click", function () {
-    filteredButtons = filterContent("Utilities", [...buttons]);
+    filteredButtons = toggleFilter("filter-utilities", [...buttons]);
+  });
+
+  var filterFinance = document.getElementById("filter-finance");
+  filterFinance.addEventListener("click", function () {
+    filteredButtons = toggleFilter("filter-finance", [...buttons]);
+  });
+
+  var filterSocial = document.getElementById("filter-social");
+  filterSocial.addEventListener("click", function () {
+    filteredButtons = toggleFilter("filter-social", [...buttons]);
+  });
+
+  var filterEntertainment = document.getElementById("filter-entertainment");
+  filterEntertainment.addEventListener("click", function () {
+    filteredButtons = toggleFilter("filter-entertainment", [...buttons]);
+  });
+
+  var filter_Shopping_Food = document.getElementById("filter-shopping-food");
+  filter_Shopping_Food.addEventListener("click", function () {
+    filteredButtons = toggleFilter("filter-shopping-food", [...buttons]);
+  });
+
+  var filter_Health_Fitness = document.getElementById("filter-health-fitness");
+  filter_Health_Fitness.addEventListener("click", function () {
+    filteredButtons = toggleFilter("filter-health-fitness", [...buttons]);
   });
 
   var filterNone = document.getElementById("filter-none");
   filterNone.addEventListener("click", function () {
-    filteredButtons = filterContent("None", [...buttons]);
+    filteredButtons = toggleFilter("filter-none", [...buttons]);
   });
 
   var item1 = document.getElementById("item1");
@@ -463,7 +496,7 @@ function setStatistics(buttons, totalTime) {
 }
 
 function getRandomColor() {
-  var letters = 'ABCDE'.split('');
+  var letters = 'BCDEF'.split('');
   var color = '#';
   for (var i = 0; i < 6; i++ ) {
       color += letters[Math.floor(Math.random() * letters.length)];
@@ -509,4 +542,29 @@ function zeroButtons() {
   chrome.storage.local.set({ sortingData: "Usage-HighToLow" }, function () {
     console.log("Data saved:", "Usage-HighToLow");
   });
+}
+
+function toggleFilter(filterId, buttons) {
+  var filterButton = document.getElementById(filterId);
+
+  // Toggle the 'active' class on the clicked button
+  filterButton.classList.toggle('active');
+
+  var activeFilters = document.querySelectorAll('.filter-item.active');
+  var filters = document.querySelectorAll('.filter-item');
+
+  Array.from(filters).map(function (filter) {
+    document.getElementById(filter.id).style.backgroundColor = '#fff';
+    document.getElementById(filter.id).style.color = '#000';
+  });
+
+  const selectedFilters = Array.from(activeFilters).map(function (filter) {
+    document.getElementById(filter.id).style.backgroundColor = '#08f';
+    document.getElementById(filter.id).style.color = '#fff';
+    
+    return filter.id.replace('filter-', '');
+  });
+
+  console.log(selectedFilters);
+  return filterContent(selectedFilters, [...buttons]);
 }

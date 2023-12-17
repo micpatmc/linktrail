@@ -98,8 +98,15 @@
   height: 7.5%;
   background-color: white;
   border-bottom: 1px solid rgb(0, 0, 0, 0.08);
-  animation-duration: 1s;
+  z-index: 1;
+  animation-duration: 0.4s;
   animation-name: slideDown;
+}
+
+.header img {
+  position: relative;
+  left: 10px;
+  width: 20px;
 }
 
 .header p {
@@ -126,27 +133,70 @@
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
+
 }
 
 .header a:hover {
   background-color: #6dc2ff;
 }
 
-.navbar {
+/* .navbar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
   position: absolute;
   top: 7.5%;
   height: 7.5%;
   width: 100%;
+  border-bottom: 1px solid rgb(0, 0, 0, 0.08);
+} */
+
+.navbar div {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  color: black;
+  font-size: 18px;
+  height: 100%;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.navbar div a {
+  display: block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.navbar div:nth-child(1) a {
+  animation-duration: 0.8s;
+  animation-name: slideDown;
+}
+
+.navbar div:nth-child(2) a {
+  animation-duration: 1s;
+  animation-name: slideDown;
+}
+
+.navbar div:hover {
+  background-color: rgb(0, 0, 0, 0.05);
 }
 
 .analytics-section {
   position: absolute;
 
-  /* TODO: For navbar, use these measurements */
+  /* For navbar, use these measurements */
   /* top: 15%;
   width: 100%;
   height: 40%; */
 
+  /* Without navbar */
   top: 7.5%;
   width: 100%;
   height: 47.5%;
@@ -220,7 +270,7 @@
   position: relative;
   top: 10%;
   left: 5%;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .track-settings {
@@ -254,12 +304,13 @@
   background-color: white;
   border-radius: 10px;
   border: 1px solid rgba(0, 0, 0, 0.40);
-  transition: all 0.3 ease-in-out;
+  transition: background-color 0.3s ease-in-out;
   cursor: pointer;
 }
 
-.filter-item:hover {
-  background-color: rgb(0, 0, 0, 0.2);
+.filter-item:active {
+  background-color: rgb(0, 0, 0, 0.05)!important;
+  color: black;
 }
 
 .sorting-section {

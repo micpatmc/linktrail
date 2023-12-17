@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "LinkTrail",
   "description": "Allows you to track website usage, see where you spend your time, and make plans for the future based on your needs.",
-  "version": "1.0",
+  "version": "1.0.1",
   "permissions": ["storage", "tabs"],
   "background": {
     "service_worker": "./src/background.js"

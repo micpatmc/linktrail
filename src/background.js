@@ -119,7 +119,6 @@ function isActiveTab(tabURL) {
 // Function to store tab data in storage
 function saveData(data) {
   chrome.storage.local.set({ 'usageData': data }, function () {
-    console.log('Data saved:', data);
   });
 }
 
