@@ -63,13 +63,14 @@ chrome.tabs.onActivated.addListener(async (activeInfo) => {
       origin: new URL(tab.url).origin,
       favicon: tab.favIconUrl,
     };
+    console.log("Top: " + tabData[activeTabURL]);
   }
 });
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (changeInfo.status === "complete") {
     // Initialize or update tabData for the tab
-    const shortenedURL = extractDomainAndPath(tab.url);
+    const shortenedURL = await extractDomainAndPath(tab.url);
     activeTabURL = shortenedURL;
     if (!tabData[tab.url]) {
       console.log("New tab");
@@ -85,6 +86,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       console.log("Old tab");
       tabData[shortenedURL].url = shortenedURL;
     }
+    console.log("Bottom: " + tabData[tab.url]);
   }
 });
 
@@ -109,6 +111,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.message === "getTabData") {
     updateTabData(activeTabURL); // Update the active tab before sending data
     sendResponse({ tabData });
+  }
+
+  if (request.message === "pageLoaded")
+  {
+    console.log("Hello");
   }
 });
 
