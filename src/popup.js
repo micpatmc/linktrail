@@ -1,16 +1,16 @@
 // Key = Website origin; Value = Category type
 const categoryMap = new Map([
-  ["chrome://newtab", "Utilities"],
-  ["https://www.w3schools.com", "Education"],
-  ["https://trello.com", "Productivity"],
-  ["https://search.google.com", "Utilities"],
-  ["https://planyway.com", "Productivity"],
-  ["https://jobs.careers.microsoft.com", "Productivity"],
-  ["https://github.com", "Utilities"],
-  ["http://getlinktrail.com", "Utilities"],
-  ["https://docs.google.com", "Utilities"],
-  ["https://calendar.google.com", "Utilities"],
-  ["https://analytics.google.com", "Utilities"],
+  // ["chrome://newtab", "Utilities"],
+  // ["https://www.w3schools.com", "Education"],
+  // ["https://trello.com", "Productivity"],
+  // ["https://search.google.com", "Utilities"],
+  // ["https://planyway.com", "Productivity"],
+  // ["https://jobs.careers.microsoft.com", "Productivity"],
+  // ["https://github.com", "Utilities"],
+  // ["http://getlinktrail.com", "Utilities"],
+  // ["https://docs.google.com", "Utilities"],
+  // ["https://calendar.google.com", "Utilities"],
+  // ["https://analytics.google.com", "Utilities"],
 ]);
 
 const categoryTimeMap = new Map([
@@ -205,7 +205,7 @@ function createButton(tabInfo, totalTime) {
     categoryTimeMap.set(categoryParagraph.textContent, categoryTimeMap.get(categoryParagraph.textContent) + tabInfo.usageTime);
     categoryQuantityMap.set(categoryParagraph.textContent, categoryQuantityMap.get(categoryParagraph.textContent) + 1);
   } else {
-    categoryParagraph.textContent = "None";
+    categoryParagraph.textContent = "N/A";
     categoryButton.backgroundColor = "rgb(0, 0, 0, 0.06)";
   }
 
@@ -359,8 +359,8 @@ function sortContent(item, buttons) {
     buttons.sort((buttonA, buttonB) => {
       const categoryA = buttonA.dataset.category;
       const categoryB = buttonB.dataset.category;
-      if (categoryA != "None" && categoryB == "None") return -1;
-      if (categoryA == "None" && categoryB != "None") return 1;
+      if (categoryA != "N/A" && categoryB == "N/A") return -1;
+      if (categoryA == "N/A" && categoryB != "N/A") return 1;
       return categoryA.localeCompare(categoryB);
     });
   }
@@ -371,8 +371,8 @@ function sortContent(item, buttons) {
     buttons.sort((buttonA, buttonB) => {
       const categoryA = buttonA.dataset.category;
       const categoryB = buttonB.dataset.category;
-      if (categoryA != "None" && categoryB == "None") return -1;
-      if (categoryA == "None" && categoryB != "None") return 1;
+      if (categoryA != "N/A" && categoryB == "N/A") return -1;
+      if (categoryA == "N/A" && categoryB != "N/A") return 1;
       return categoryB.localeCompare(categoryA);
     });
   }
@@ -425,9 +425,9 @@ function checkButtonClicks(buttons, filteredButtons) {
     filteredButtons = toggleFilter("filter-health-fitness", [...buttons]);
   });
 
-  var filterNone = document.getElementById("filter-none");
+  var filterNone = document.getElementById("filter-n/a");
   filterNone.addEventListener("click", function () {
-    filteredButtons = toggleFilter("filter-none", [...buttons]);
+    filteredButtons = toggleFilter("filter-n/a", [...buttons]);
   });
 
   var item1 = document.getElementById("item1");

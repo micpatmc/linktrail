@@ -86,7 +86,6 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
       console.log("Old tab");
       tabData[shortenedURL].url = shortenedURL;
     }
-    console.log("Bottom: " + tabData[tab.url]);
   }
 });
 
@@ -126,6 +125,7 @@ function isActiveTab(tabURL) {
 // Function to store tab data in storage
 function saveData(data) {
   chrome.storage.local.set({ 'usageData': data }, function () {
+    console.log(data);
   });
 }
 
