@@ -1,58 +1,3 @@
-// Key = Website origin; Value = Category type
-const categoryMap = new Map([
-  // ["chrome://newtab", "Utilities"],
-  // ["https://www.w3schools.com", "Education"],
-  // ["https://trello.com", "Productivity"],
-  // ["https://search.google.com", "Utilities"],
-  // ["https://planyway.com", "Productivity"],
-  // ["https://jobs.careers.microsoft.com", "Productivity"],
-  // ["https://github.com", "Utilities"],
-  // ["http://getlinktrail.com", "Utilities"],
-  // ["https://docs.google.com", "Utilities"],
-  // ["https://calendar.google.com", "Utilities"],
-  // ["https://analytics.google.com", "Utilities"],
-]);
-
-const categoryTimeMap = new Map([
-  ["Productivity", 0],
-  ["Education", 0],
-  ["Utilities", 0],
-  ["Finance", 0],
-  ["Social", 0],
-  ["Entertainment", 0],
-  ["Shopping & Food", 0],
-  ["Health & Fitness", 0],
-])
-
-const categoryQuantityMap = new Map([
-  ["Productivity", 0],
-  ["Education", 0],
-  ["Utilities", 0],
-  ["Finance", 0],
-  ["Social", 0],
-  ["Entertainment", 0],
-  ["Shopping & Food", 0],
-  ["Health & Fitness", 0],
-])
-
-
-// Key = Category type; Value = RGB color value
-const colorMap = new Map([
-  ["Productivity", "rgb(255, 0, 0, 0.06)"],
-  ["Education", "rgb(0, 255, 0, 0.06)"],
-  ["Utilities", "rgb(0, 0, 255, 0.06)"],
-]);
-
-// Current categories:
-// Productivity
-// Education
-// Utilities
-// Finance
-// Social
-// Entertainment
-// Shopping & Food
-// Health & Fitness
-
 // Run every time the popup is opened
 document.addEventListener("DOMContentLoaded", function () {
   chrome.runtime.sendMessage(
@@ -187,30 +132,6 @@ function createButton(tabInfo, totalTime) {
     chrome.tabs.create({ url: `${tabInfo.origin}` }); // Replace with your desired URL
   });
 
-  // Create category
-  const categoryButton = document.createElement("button");
-  categoryButton.className = "category-button";
-
-  // Create Text for the category
-  const categoryParagraph = document.createElement("p");
-  categoryParagraph.id = "category";
-
-  // Fill in the category based on global map
-  if (categoryMap.has(tabInfo.origin)) {
-    categoryParagraph.textContent = categoryMap.get(tabInfo.origin);
-    categoryButton.style.backgroundColor = colorMap.get(
-      categoryParagraph.textContent
-    );
-
-    categoryTimeMap.set(categoryParagraph.textContent, categoryTimeMap.get(categoryParagraph.textContent) + tabInfo.usageTime);
-    categoryQuantityMap.set(categoryParagraph.textContent, categoryQuantityMap.get(categoryParagraph.textContent) + 1);
-  } else {
-    categoryParagraph.textContent = "N/A";
-    categoryButton.backgroundColor = "rgb(0, 0, 0, 0.06)";
-  }
-
-  categoryButton.appendChild(categoryParagraph);
-
   // Website icon image element
   const img = document.createElement("img");
   img.id = "image";
@@ -258,7 +179,6 @@ function createButton(tabInfo, totalTime) {
 
   // Append the image, paragraphs, and progress bar to the button
   button.appendChild(img);
-  button.appendChild(categoryButton);
   button.appendChild(progressBarBackground);
   button.appendChild(progressBar);
   button.appendChild(nameParagraph);
@@ -267,7 +187,6 @@ function createButton(tabInfo, totalTime) {
 
   // Set button data
   button.dataset.time = tabInfo.usageTime;
-  button.dataset.category = categoryParagraph.textContent;
   button.dataset.name = nameParagraph.textContent;
   button.dataset.progress = progressWidth.toFixed(1);
   
@@ -298,16 +217,6 @@ function filterContent(item, buttons) {
   });
 
   var filteredButtons = buttons;
-
-  if (item.length > 0)
-  {
-    // Sort the buttons based on the category
-    for (let i = filteredButtons.length - 1; i >= 0; i--) {
-      if (!item.includes(filteredButtons[i].dataset.category.toLowerCase())) {
-        filteredButtons.splice(i, 1);
-      }
-    }
-  }
 
   const content = document.querySelector(".content");
 
@@ -352,30 +261,6 @@ function sortContent(item, buttons) {
       return timeA - timeB;
     });
   }
-  // Sort the buttons based on categories, in alphabetical order
-  else if (item == "Category-HighToLow") {
-    sortText.textContent = "Category (Alphabetical)";
-
-    buttons.sort((buttonA, buttonB) => {
-      const categoryA = buttonA.dataset.category;
-      const categoryB = buttonB.dataset.category;
-      if (categoryA != "N/A" && categoryB == "N/A") return -1;
-      if (categoryA == "N/A" && categoryB != "N/A") return 1;
-      return categoryA.localeCompare(categoryB);
-    });
-  }
-  // Sort the buttons based on categories, in alphabetical order
-  else if (item == "Category-LowToHigh") {
-    sortText.textContent = "Category (Reverse-Alphabetical)";
-
-    buttons.sort((buttonA, buttonB) => {
-      const categoryA = buttonA.dataset.category;
-      const categoryB = buttonB.dataset.category;
-      if (categoryA != "N/A" && categoryB == "N/A") return -1;
-      if (categoryA == "N/A" && categoryB != "N/A") return 1;
-      return categoryB.localeCompare(categoryA);
-    });
-  }
 
   // Place buttons into the DOM
   const content = document.querySelector(".content");
@@ -384,51 +269,6 @@ function sortContent(item, buttons) {
 
 // Check if buttons are being clicked
 function checkButtonClicks(buttons, filteredButtons) {
-
-  var filterProductivity = document.getElementById("filter-productivity");
-  filterProductivity.addEventListener("click", function () {
-    filteredButtons = toggleFilter("filter-productivity", [...buttons]);
-  });
-
-  var filterEducation = document.getElementById("filter-education");
-  filterEducation.addEventListener("click", function () {
-    filteredButtons = toggleFilter("filter-education", [...buttons]);
-  });
-
-  var filterUtilities = document.getElementById("filter-utilities");
-  filterUtilities.addEventListener("click", function () {
-    filteredButtons = toggleFilter("filter-utilities", [...buttons]);
-  });
-
-  var filterFinance = document.getElementById("filter-finance");
-  filterFinance.addEventListener("click", function () {
-    filteredButtons = toggleFilter("filter-finance", [...buttons]);
-  });
-
-  var filterSocial = document.getElementById("filter-social");
-  filterSocial.addEventListener("click", function () {
-    filteredButtons = toggleFilter("filter-social", [...buttons]);
-  });
-
-  var filterEntertainment = document.getElementById("filter-entertainment");
-  filterEntertainment.addEventListener("click", function () {
-    filteredButtons = toggleFilter("filter-entertainment", [...buttons]);
-  });
-
-  var filter_Shopping_Food = document.getElementById("filter-shopping-food");
-  filter_Shopping_Food.addEventListener("click", function () {
-    filteredButtons = toggleFilter("filter-shopping-food", [...buttons]);
-  });
-
-  var filter_Health_Fitness = document.getElementById("filter-health-fitness");
-  filter_Health_Fitness.addEventListener("click", function () {
-    filteredButtons = toggleFilter("filter-health-fitness", [...buttons]);
-  });
-
-  var filterNone = document.getElementById("filter-n/a");
-  filterNone.addEventListener("click", function () {
-    filteredButtons = toggleFilter("filter-n/a", [...buttons]);
-  });
 
   var item1 = document.getElementById("item1");
   item1.addEventListener("click", function () {
@@ -439,30 +279,20 @@ function checkButtonClicks(buttons, filteredButtons) {
   item2.addEventListener("click", function () {
     sortContent("Usage-LowToHigh", filteredButtons);
   });
-
-  var item3 = document.getElementById("item3");
-  item3.addEventListener("click", function () {
-    sortContent("Category-HighToLow", filteredButtons);
-  });
-
-  var item4 = document.getElementById("item4");
-  item4.addEventListener("click", function () {
-    sortContent("Category-LowToHigh", filteredButtons);
-  });
 }
 
 function setStatistics(buttons, totalTime) {
   const totalTimeStat = document.getElementById("stat-total-time");
-  const sessionCountStat = document.getElementById("stat-session-count");
   const usageStat = document.getElementById("stat-usage");
-  const usageCategoryStat = document.getElementById("stat-usage-category");
-  const quantityCategoryStat = document.getElementById("stat-quantity-category");
+  const usageStatHighest = document.getElementById("stat-usage-highest");
+  const usageStatLowest = document.getElementById("stat-usage-lowest");
+  const trackingCount = document.getElementById("tracking-count");
 
   // Total time stat
   const totalSeconds = totalTime;
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = Math.floor(totalSeconds % 60);
+  var hours = Math.floor(totalSeconds / 3600);
+  var minutes = Math.floor((totalSeconds % 3600) / 60);
+  var seconds = Math.floor(totalSeconds % 60);
 
   if (hours > 0)
     totalTimeStat.textContent = `${hours.toString().padStart(2, "0")}h ${minutes
@@ -481,18 +311,34 @@ function setStatistics(buttons, totalTime) {
     return timeB - timeA;
   });
 
+  var highestTime = buttons[0].dataset.time / 1000;
+  hours = Math.floor(highestTime / 3600);
+  minutes = Math.floor((highestTime % 3600) / 60);
+  seconds = Math.floor(highestTime % 60);
+
+  if (hours > 0)
+  usageStatHighest.textContent = `${hours.toString().padStart(2, "0")}h ${minutes.toString().padStart(2, "0")}m ${seconds.toString().padStart(2, "0")}s`;
+  else if (minutes > 0)
+  usageStatHighest.textContent = `${minutes.toString().padStart(2, "0")}m ${seconds.toString().padStart(2, "0")}s`;
+  else usageStatHighest.textContent = `${seconds.toString().padStart(2, "0")}s`;
+
   if (buttons[0].dataset.name.length >= 21)
     usageStat.textContent = buttons[0].dataset.name.substring(0, 22) + "...";
   else
     usageStat.textContent = buttons[0].dataset.name;
 
-  // Usage category stat
-  const usageKey = Array.from(categoryTimeMap.entries()).reduce((a, b) => (b[1] > a[1] ? b : a))[0];
-  usageCategoryStat.textContent = usageKey;
+  buttons.sort((buttonA, buttonB) => {
+    const timeA = buttonA.dataset.time;
+    const timeB = buttonB.dataset.time;
+    return timeA - timeB;
+  });
 
-  // Quantity category stat
-  const quantityKey = Array.from(categoryQuantityMap.entries()).reduce((a, b) => (b[1] > a[1] ? b : a))[0];
-  quantityCategoryStat.textContent = quantityKey;
+  if (buttons[0].dataset.name.length >= 21)
+    usageStatLowest.textContent = buttons[0].dataset.name.substring(0, 22) + "...";
+  else
+  usageStatLowest.textContent = buttons[0].dataset.name;
+
+  trackingCount.textContent = "Tracking " + buttons.length + " Different Websites";
 }
 
 function getRandomColor() {
