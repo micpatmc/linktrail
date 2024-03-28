@@ -4,9 +4,9 @@
   padding: 0;
   scroll-behavior: auto;
   font-family: "Roboto", sans-serif;
-  -webkit-user-select: none; /* Safari */
-  -ms-user-select: none; /* IE 10 and IE 11 */
-  user-select: none; /* Standard syntax */
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 /* Animations */
@@ -52,12 +52,12 @@
 
 /* Track */
 ::-webkit-scrollbar-track {
- background: #f1f1f1;
+  background: #f1f1f1;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
- background: #bec4c4;
+  background: #bec4c4;
 }
 
 /* Handle on hover */
@@ -124,7 +124,7 @@
   justify-content: center;
   align-items: center;
   text-decoration: none;
-  background-color: #00ABC2;
+  background-color: #00abc2;
   color: white;
   width: 90px;
   height: 30px;
@@ -133,7 +133,6 @@
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
-
 }
 
 .header a:hover {

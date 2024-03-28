@@ -33,29 +33,21 @@ document.addEventListener("DOMContentLoaded", function () {
       if (buttons.length == 0) {
         zeroButtons();
         return;
-      } 
+      }
 
-      var filteredButtons = [];
-
-      // Get the filter data and assign filtered buttons
-      chrome.storage.local.get("filterData", function (result) {
-        result.filterData.forEach((filter) => filteredButtons = toggleFilter("filter-" + filter, [...buttons]));
-        callback(result);
-      })
-      
       // Call function to check for button clicks
-      checkButtonClicks([...buttons], filteredButtons);
-      
+      checkButtonClicks([...buttons]);
+
       // Create the initial doughnut chart
       createChart([...buttons]);
-      
+
       // Set the statistics
       setStatistics([...buttons], totalTime);
-      
+
       // Get the sorting data and place buttons
       chrome.storage.local.get("sortingData", function (result) {
         const sortKey = result.sortingData | "Usage-HighToLow";
-        sortContent(result.sortingData, filteredButtons);
+        sortContent(result.sortingData, buttons);
         callback(result);
       });
     }
@@ -64,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function createChart(buttons) {
   // Get the canvas element
-  var ctx = document.getElementById('myChart').getContext('2d');
+  var ctx = document.getElementById("myChart").getContext("2d");
 
   buttons.sort((buttonA, buttonB) => {
     const timeA = buttonA.dataset.time;
@@ -75,26 +67,27 @@ function createChart(buttons) {
 
   // Data for the chart
   var data = {
-    labels: buttons.map(function(button) {
-      if (button.dataset.name.length > 17)
-      {
+    labels: buttons.map(function (button) {
+      if (button.dataset.name.length > 17) {
         var truncatedName = button.dataset.name.substring(0, 18) + "...";
         return truncatedName;
       }
 
       return button.dataset.name;
     }),
-    datasets: [{
-      data: buttons.map(function(button) {
-        return button.dataset.progress;
-      }),
-      backgroundColor: buttons.map(function(button) {
-        return button.dataset.color;
-      }),
-      hoverBackgroundColor: buttons.map(function(button) {
-        return getLighterColor(button.dataset.color, 20);
-      }),
-    }]
+    datasets: [
+      {
+        data: buttons.map(function (button) {
+          return button.dataset.progress;
+        }),
+        backgroundColor: buttons.map(function (button) {
+          return button.dataset.color;
+        }),
+        hoverBackgroundColor: buttons.map(function (button) {
+          return getLighterColor(button.dataset.color, 20);
+        }),
+      },
+    ],
   };
 
   // Chart configuration
@@ -105,20 +98,19 @@ function createChart(buttons) {
 
     plugins: {
       legend: {
-        position: 'right',
+        position: "right",
         maxHeight: 10,
-      }
-    }
+      },
+    },
   };
 
   // Create the doughnut chart
   new Chart(ctx, {
-    type: 'doughnut',
+    type: "doughnut",
     data: data,
-    options: options
+    options: options,
   });
 }
-
 
 function createButton(tabInfo, totalTime) {
   // Create the button
@@ -134,7 +126,8 @@ function createButton(tabInfo, totalTime) {
   const img = document.createElement("img");
   img.id = "image";
 
-  if (tabInfo.favicon == "") img.src = "../public/Backup.png";
+  if (tabInfo.favicon == "" || tabInfo.favicon == undefined)
+    img.src = "../public/backup.png";
   else img.src = tabInfo.favicon;
 
   // Create the first paragraph element with ID "name"
@@ -187,56 +180,33 @@ function createButton(tabInfo, totalTime) {
   button.dataset.time = tabInfo.usageTime;
   button.dataset.name = nameParagraph.textContent;
   button.dataset.progress = progressWidth.toFixed(1);
-  
+
   const storedData = localStorage.getItem(button.dataset.name + " : Color");
-  if (storedData === null)
-  {
+  if (storedData === null) {
     button.dataset.color = getRandomColor();
-    localStorage.setItem(button.dataset.name + " : Color", JSON.stringify(button.dataset.color));
-    
-    // button.dataset.lightColor = getLighterColor(button.dataset.color, 20);
-    // localStorage.setItem(button.nameParagraph.content + " : Light Color", JSON.stringify(button.dataset.color));
-  }
-  else
-  {
-    button.dataset.color = JSON.parse(localStorage.getItem(button.dataset.name + " : Color"));
+    localStorage.setItem(
+      button.dataset.name + " : Color",
+      JSON.stringify(button.dataset.color)
+    );
+  } else {
+    button.dataset.color = JSON.parse(
+      localStorage.getItem(button.dataset.name + " : Color")
+    );
   }
 
   return button;
 }
 
-// Ability to set filters for buttons
-function filterContent(item, buttons) {
-  // Save the filter setting
-  chrome.storage.local.set({ filterData: item }, function () {
-  });
-
-  var filteredButtons = buttons;
-
-  const content = document.querySelector(".content");
-
-  // Remove existing buttons
-  while (content.firstChild) {
-    content.removeChild(content.firstChild);
-  }
-
-  // Place filter buttons into the DOM
-  filteredButtons.forEach((button) => content.appendChild(button));
-
-  // Return the filtered buttons
-  return buttons;
-}
-
 // Handle button sorting
 function sortContent(item, buttons) {
+  if (item == undefined) item = "Usage-HighToLow";
+
   // Save the sorting value
-  chrome.storage.local.set({ sortingData: item }, function () {
-  });
+  chrome.storage.local.set({ sortingData: item }, function () {});
 
   const sortText = document.querySelector("#sort-text");
-
   // Sort the buttons based on descending time
-  if (item == "Usage-HighToLow") {
+  if (item == "Usage-HighToLow" || item == undefined) {
     sortText.textContent = "Usage Time (High to low)";
 
     buttons.sort((buttonA, buttonB) => {
@@ -256,22 +226,23 @@ function sortContent(item, buttons) {
     });
   }
 
+  console.log(buttons);
+
   // Place buttons into the DOM
   const content = document.querySelector(".content");
   buttons.forEach((button) => content.appendChild(button));
 }
 
 // Check if buttons are being clicked
-function checkButtonClicks(buttons, filteredButtons) {
-
+function checkButtonClicks(buttons) {
   var item1 = document.getElementById("item1");
   item1.addEventListener("click", function () {
-    sortContent("Usage-HighToLow", filteredButtons);
+    sortContent("Usage-HighToLow", buttons);
   });
 
   var item2 = document.getElementById("item2");
   item2.addEventListener("click", function () {
-    sortContent("Usage-LowToHigh", filteredButtons);
+    sortContent("Usage-LowToHigh", buttons);
   });
 }
 
@@ -297,7 +268,7 @@ function setStatistics(buttons, totalTime) {
       .toString()
       .padStart(2, "0")}m ${seconds.toString().padStart(2, "0")}s`;
   else totalTimeStat.textContent = `${seconds.toString().padStart(2, "0")}s`;
-  
+
   // Usage stat
   buttons.sort((buttonA, buttonB) => {
     const timeA = buttonA.dataset.time;
@@ -311,15 +282,20 @@ function setStatistics(buttons, totalTime) {
   seconds = Math.floor(highestTime % 60);
 
   if (hours > 0)
-  usageStatHighest.textContent = `${hours.toString().padStart(2, "0")}h ${minutes.toString().padStart(2, "0")}m ${seconds.toString().padStart(2, "0")}s`;
+    usageStatHighest.textContent = `${hours
+      .toString()
+      .padStart(2, "0")}h ${minutes.toString().padStart(2, "0")}m ${seconds
+      .toString()
+      .padStart(2, "0")}s`;
   else if (minutes > 0)
-  usageStatHighest.textContent = `${minutes.toString().padStart(2, "0")}m ${seconds.toString().padStart(2, "0")}s`;
+    usageStatHighest.textContent = `${minutes
+      .toString()
+      .padStart(2, "0")}m ${seconds.toString().padStart(2, "0")}s`;
   else usageStatHighest.textContent = `${seconds.toString().padStart(2, "0")}s`;
 
   if (buttons[0].dataset.name.length >= 21)
     usageStat.textContent = buttons[0].dataset.name.substring(0, 22) + "...";
-  else
-    usageStat.textContent = buttons[0].dataset.name;
+  else usageStat.textContent = buttons[0].dataset.name;
 
   buttons.sort((buttonA, buttonB) => {
     const timeA = buttonA.dataset.time;
@@ -328,18 +304,19 @@ function setStatistics(buttons, totalTime) {
   });
 
   if (buttons[0].dataset.name.length >= 21)
-    usageStatLowest.textContent = buttons[0].dataset.name.substring(0, 22) + "...";
-  else
-  usageStatLowest.textContent = buttons[0].dataset.name;
+    usageStatLowest.textContent =
+      buttons[0].dataset.name.substring(0, 22) + "...";
+  else usageStatLowest.textContent = buttons[0].dataset.name;
 
-  trackingCount.textContent = "Tracking " + buttons.length + " Different Websites";
+  trackingCount.textContent =
+    "Tracking " + buttons.length + " Different Websites";
 }
 
 function getRandomColor() {
-  var letters = 'BCDEF'.split('');
-  var color = '#';
-  for (var i = 0; i < 6; i++ ) {
-      color += letters[Math.floor(Math.random() * letters.length)];
+  var letters = "BCDEF".split("");
+  var color = "#";
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * letters.length)];
   }
   return color;
 }
@@ -363,14 +340,14 @@ function getLighterColor(color, percent) {
   b = Math.min(255, b);
 
   // Convert back to hex
-  var lighterColor = '#' + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
+  var lighterColor =
+    "#" + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1);
 
   return lighterColor;
 }
 
 function saveData(data) {
-  chrome.storage.local.set({ 'test': data }, function () {
-  });
+  chrome.storage.local.set({ test: data }, function () {});
 }
 
 function zeroButtons() {
@@ -378,30 +355,5 @@ function zeroButtons() {
   document.querySelector(".main-no-button").style.display = "flex";
   document.querySelector("#sort-text").textContent = "Usage-HighToLow";
 
-  chrome.storage.local.set({ sortingData: "Usage-HighToLow" }, function () {
-  });
-}
-
-function toggleFilter(filterId, buttons) {
-  var filterButton = document.getElementById(filterId);
-
-  // Toggle the 'active' class on the clicked button
-  filterButton.classList.toggle('active');
-
-  var activeFilters = document.querySelectorAll('.filter-item.active');
-  var filters = document.querySelectorAll('.filter-item');
-
-  Array.from(filters).map(function (filter) {
-    document.getElementById(filter.id).style.backgroundColor = '#fff';
-    document.getElementById(filter.id).style.color = '#000';
-  });
-
-  const selectedFilters = Array.from(activeFilters).map(function (filter) {
-    document.getElementById(filter.id).style.backgroundColor = '#08f';
-    document.getElementById(filter.id).style.color = '#fff';
-    
-    return filter.id.replace('filter-', '');
-  });
-
-  return filterContent(selectedFilters, [...buttons]);
+  chrome.storage.local.set({ sortingData: "Usage-HighToLow" }, function () {});
 }

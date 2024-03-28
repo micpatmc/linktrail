@@ -41,28 +41,16 @@ function getTabInfo(tabId) {
   });
 }
 
-chrome.tabs.onActivated.addListener(async (activeInfo) => {
-  const tab = await getTabInfo(activeInfo.tabId);
-  if (tab.url == "") activeTabURL = extractDomainAndPath(tab.pendingUrl);
-  else activeTabURL = extractDomainAndPath(tab.url);
-
-  if (!tabData[activeTabURL] && activeTabURL !== undefined) {
-    tabData[activeTabURL] = {
-      url: activeTabURL,
-      startTime: Date.now(),
-      usageTime: 0,
-      origin: new URL(tab.url).origin,
-      favicon: tab.favIconUrl,
-    };
-  }
-});
-
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (changeInfo.status === "complete") {
     // Initialize or update tabData for the tab
     const shortenedURL = await extractDomainAndPath(tab.url);
+    console.log(tab);
+
     activeTabURL = shortenedURL;
-    if (!tabData[tab.url]) {
+    if (tabData[shortenedURL] && tabData[shortenedURL].favicon == undefined) {
+      tabData[shortenedURL].favicon = tab.favIconUrl;
+    } else if (!tabData[tab.url]) {
       tabData[shortenedURL] = {
         url: shortenedURL,
         startTime: Date.now(),
@@ -85,17 +73,15 @@ chrome.windows.onFocusChanged.addListener((windowId) => {
   }
 });
 
+// Extract the domain and path of the URL
 function extractDomainAndPath(url) {
   const urlObject = new URL(url);
   return urlObject.host;
 }
 
-// Periodically update all tabs to ensure accurate time tracking
-setInterval(updateAllTabs, 1000);
-
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.message === "getTabData") {
-    updateTabData(activeTabURL); // Update the active tab before sending data
+    updateTabData(activeTabURL);
     sendResponse({ tabData });
   }
 });
@@ -106,16 +92,19 @@ function isActiveTab(tabURL) {
 
 // Function to store tab data in storage
 function saveData(data) {
-  chrome.storage.local.set({ 'usageData': data }, function () {
-  });
+  chrome.storage.local.set({ usageData: data }, function () {});
 }
 
 // Function to retrieve tab data from storage
 function loadData(callback) {
-  chrome.storage.local.get('usageData', function (result) {
+  chrome.storage.local.get("usageData", function (result) {
     tabData = result.usageData || [];
     callback(tabData);
   });
 }
 
+// Periodically update all tabs to ensure accurate time tracking
+setInterval(updateAllTabs, 1000);
+
+// Load the tab data
 loadData();

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "LinkTrail",
-  "description": "Allows you to track website usage, see where you spend your time, and make plans for the future based on your needs.",
-  "version": "1.0.2",
+  "description": "An extension that allows you to track your website activity, and see where you spend your time online.",
+  "version": "1.0.4",
   "permissions": ["storage", "tabs"],
   "background": {
     "service_worker": "./src/background.js"
