@@ -55,9 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
       // Get the sorting data and place buttons
       chrome.storage.local.get("sortingData", function (result) {
         const sortKey = result.sortingData | "Usage-HighToLow";
-        console.log(sortKey);
         sortContent(result.sortingData, filteredButtons);
-        console.log("Data loaded:", result.sortingData);
         callback(result);
       });
     }
@@ -191,10 +189,8 @@ function createButton(tabInfo, totalTime) {
   button.dataset.progress = progressWidth.toFixed(1);
   
   const storedData = localStorage.getItem(button.dataset.name + " : Color");
-  console.log(storedData);
   if (storedData === null)
   {
-    console.log("HERE");
     button.dataset.color = getRandomColor();
     localStorage.setItem(button.dataset.name + " : Color", JSON.stringify(button.dataset.color));
     
@@ -213,7 +209,6 @@ function createButton(tabInfo, totalTime) {
 function filterContent(item, buttons) {
   // Save the filter setting
   chrome.storage.local.set({ filterData: item }, function () {
-    console.log("Data saved:", item);
   });
 
   var filteredButtons = buttons;
@@ -236,7 +231,6 @@ function filterContent(item, buttons) {
 function sortContent(item, buttons) {
   // Save the sorting value
   chrome.storage.local.set({ sortingData: item }, function () {
-    console.log("Data saved:", item);
   });
 
   const sortText = document.querySelector("#sort-text");
@@ -376,7 +370,6 @@ function getLighterColor(color, percent) {
 
 function saveData(data) {
   chrome.storage.local.set({ 'test': data }, function () {
-    console.log('Data saved:', data);
   });
 }
 
@@ -386,7 +379,6 @@ function zeroButtons() {
   document.querySelector("#sort-text").textContent = "Usage-HighToLow";
 
   chrome.storage.local.set({ sortingData: "Usage-HighToLow" }, function () {
-    console.log("Data saved:", "Usage-HighToLow");
   });
 }
 
@@ -411,6 +403,5 @@ function toggleFilter(filterId, buttons) {
     return filter.id.replace('filter-', '');
   });
 
-  console.log(selectedFilters);
   return filterContent(selectedFilters, [...buttons]);
 }

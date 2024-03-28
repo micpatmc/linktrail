@@ -29,15 +29,6 @@ function updateAllTabs() {
   }
 }
 
-// Event listener for extension startup (when Chrome is opened)
-chrome.runtime.onStartup.addListener(function () {
-  // Load data when the extension starts
-  console.log("Chrome has started");
-  loadData(function (data) {
-    console.log('Extension started with data:', data);
-  });
-});
-
 function getTabInfo(tabId) {
   return new Promise((resolve, reject) => {
     chrome.tabs.get(tabId, (tab) => {
@@ -63,7 +54,6 @@ chrome.tabs.onActivated.addListener(async (activeInfo) => {
       origin: new URL(tab.url).origin,
       favicon: tab.favIconUrl,
     };
-    console.log("Top: " + tabData[activeTabURL]);
   }
 });
 
@@ -73,8 +63,6 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     const shortenedURL = await extractDomainAndPath(tab.url);
     activeTabURL = shortenedURL;
     if (!tabData[tab.url]) {
-      console.log("New tab");
-
       tabData[shortenedURL] = {
         url: shortenedURL,
         startTime: Date.now(),
@@ -83,7 +71,6 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
         favicon: tab.favIconUrl,
       };
     } else {
-      console.log("Old tab");
       tabData[shortenedURL].url = shortenedURL;
     }
   }
@@ -111,11 +98,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     updateTabData(activeTabURL); // Update the active tab before sending data
     sendResponse({ tabData });
   }
-
-  if (request.message === "pageLoaded")
-  {
-    console.log("Hello");
-  }
 });
 
 function isActiveTab(tabURL) {
@@ -125,7 +107,6 @@ function isActiveTab(tabURL) {
 // Function to store tab data in storage
 function saveData(data) {
   chrome.storage.local.set({ 'usageData': data }, function () {
-    console.log(data);
   });
 }
 
@@ -133,7 +114,8 @@ function saveData(data) {
 function loadData(callback) {
   chrome.storage.local.get('usageData', function (result) {
     tabData = result.usageData || [];
-    console.log('Data loaded:', tabData);
     callback(tabData);
   });
 }
+
+loadData();
