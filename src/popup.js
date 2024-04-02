@@ -226,8 +226,6 @@ function sortContent(item, buttons) {
     });
   }
 
-  console.log(buttons);
-
   // Place buttons into the DOM
   const content = document.querySelector(".content");
   buttons.forEach((button) => content.appendChild(button));

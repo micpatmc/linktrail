@@ -45,21 +45,28 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (changeInfo.status === "complete") {
     // Initialize or update tabData for the tab
     const shortenedURL = await extractDomainAndPath(tab.url);
-    console.log(tab);
-
     activeTabURL = shortenedURL;
+
+    // Function to extract favicon from the current tab
+    const extractFavicon = async (tabId) => {
+      return new Promise((resolve) => {
+        chrome.tabs.sendMessage(tabId, { action: "extractFavicon" }, resolve);
+      });
+    };
+
+    // If the favicon is not already present in tabData, extract and add it
     if (tabData[shortenedURL] && tabData[shortenedURL].favicon == undefined) {
-      tabData[shortenedURL].favicon = tab.favIconUrl;
-    } else if (!tabData[tab.url]) {
+      const faviconUrl = await extractFavicon(tabId);
+      tabData[shortenedURL].favicon = faviconUrl;
+    } else if (!tabData[shortenedURL]) {
+      const faviconUrl = await extractFavicon(tabId);
       tabData[shortenedURL] = {
         url: shortenedURL,
         startTime: Date.now(),
         usageTime: 0,
         origin: new URL(tab.url).origin,
-        favicon: tab.favIconUrl,
+        favicon: faviconUrl,
       };
-    } else {
-      tabData[shortenedURL].url = shortenedURL;
     }
   }
 });
@@ -107,4 +114,5 @@ function loadData(callback) {
 setInterval(updateAllTabs, 1000);
 
 // Load the tab data
-loadData();
+// loadData();
+chrome.storage.sync.clear();
